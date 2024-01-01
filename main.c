@@ -3,11 +3,57 @@
 #include "functions/pacman.h"
 #include "functions/init.h"
 
+struct Ghost
+{
+    double x;
+    double y;
+    int x_block_cordinates;
+    int y_block_cordinates;
+
+    double x_speed;
+    double y_speed;
+    double moovement_speed;
+
+    double animation_frame;
+    SDL_Texture *tiles[4];
+
+    bool isAfraid;
+    char character;
+} Ghost;
+
+void initGhost(struct Ghost *ghost, struct GameMap *game_map)
+{
+    ghost->x = 14 * BLOCK_SIZE - BLOCK_SIZE / 2 + game_map->bottom_margin;
+    ghost->y = 18 * BLOCK_SIZE;
+
+    ghost->x_speed = 0;
+    ghost->y_speed = 0;
+    ghost->moovement_speed = 0;
+
+    ghost->animation_frame = 0;
+    ghost->tiles[0] = NULL;
+    ghost->tiles[1] = NULL;
+    ghost->tiles[2] = NULL;
+    ghost->tiles[3] = NULL;
+
+    ghost->isAfraid = false;
+    ghost->character = 'r';
+}
+void drawGhost(struct SDL_Renderer *renderer, struct Ghost *ghost)
+{
+    // draw ghost image hitbox
+    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+    SDL_Rect ghost_box = {.x = ghost->x, .y = ghost->y, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
+    SDL_RenderFillRect(renderer, &ghost_box);
+}
 int main()
 {
+    struct Ghost redGhost;
     struct GameMap game_map;
     struct Pacman pacman = {.lives = 4};
     struct Wall *map = NULL;
+
+    initGhost(&redGhost, &game_map);
 
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
@@ -118,6 +164,8 @@ int main()
         // draw wals, pacman, score, bg
         mapUxDraw(renderer, map, &pacman, &game_map);
 
+        // ghosts
+        drawGhost(renderer, &redGhost);
         // checking points
         if (game_map.collected_point_amount < game_map.point_amount)
         {

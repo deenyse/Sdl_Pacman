@@ -70,7 +70,7 @@ void renderMap(SDL_Renderer *renderer, struct Wall *map, int rows, int cols)
             if (map[i * cols + j].type == 'y' && map[i * cols + j].show)
             {
 
-                SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+                SDL_SetRenderDrawColor(renderer, 241, 188, 179, 255);
                 SDL_RenderFillRect(renderer, &map[i * cols + j].hitBox);
             }
         }
