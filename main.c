@@ -5,58 +5,25 @@
 
 int main()
 {
-    struct GameMap game_map = {
-        .block_width = 28,
-        .block_height = 31,
-        .pixel_height = BLOCK_SIZE * game_map.block_height,
-        .pixel_width = BLOCK_SIZE * game_map.block_width,
-        .top_margin = BLOCK_SIZE * 3,
-        .bottom_margin = BLOCK_SIZE * 2,
-        .point_amount = 0,
-        .collected_point_amount = 0,
-    };
-    struct Pacman pacman = {
-        .x = 7 * BLOCK_SIZE + game_map.bottom_margin,
-        .y = 17 * BLOCK_SIZE,
-        .x_speed = 0,
-        .y_speed = 0,
-        .moovement_speed = MOVEMENT_SPEED,
-        .animation_frame = 0,
-        .lives = 4};
-    // Inicializace SDL
-    SDL_Init(SDL_INIT_VIDEO);
-    SDL_Window *window = SDL_CreateWindow(
-        "SDL Pac-Man",                                                        // Titulek okna
-        10,                                                                   // Souřadnice x
-        10,                                                                   // Souřadnice y
-        game_map.pixel_width,                                                 // Šířka
-        game_map.pixel_height + game_map.top_margin + game_map.bottom_margin, // Výška
-        SDL_WINDOW_SHOWN                                                      // Okno se má po vytvoření rovnou zobrazit
-    );
-    // inicializace Font
-    if (TTF_Init() == -1)
-    {
-        printf("SDL_ttf could not initialize! SDL_Error: %s\n", TTF_GetError());
-        SDL_Quit();
-        return 0;
-    }
-    //
-    // Creating renderer window
-    SDL_Renderer *renderer = SDL_CreateRenderer(
-        window,
-        -1,
-        SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+    struct GameMap game_map;
+    struct Pacman pacman = {.lives = 4};
+    struct Wall *map = NULL;
 
+    SDL_Window *window = NULL;
+    SDL_Renderer *renderer = NULL;
+
+    WindowGameInit(&game_map, &pacman, &window, &renderer);
+
+    ImageInit(&pacman, &map, renderer, &game_map);
+
+    bool running = true;
     SDL_Event event = {};
-    bool running = 1;
 
     Uint64 delta_now = SDL_GetPerformanceCounter();
     Uint64 delta_last = 0;
     double delta_time = 0;
 
-    // image init
-    struct Wall *map = readMapFromFile("map.txt", &game_map, renderer);
-    initPacmanTiles(renderer, &pacman);
+    // keys
     bool key_up_pressed = false;
     bool key_down_pressed = false;
     bool key_left_pressed = false;

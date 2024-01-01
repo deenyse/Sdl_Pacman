@@ -2,6 +2,15 @@
 #define Pacman_h
 
 #include "init.h"
+void initializePacman(struct Pacman *pacman, struct GameMap *game_map)
+{
+    pacman->x = 12 * BLOCK_SIZE - BLOCK_SIZE / 2 + game_map->bottom_margin;
+    pacman->y = 20 * BLOCK_SIZE;
+    pacman->x_speed = 0;
+    pacman->y_speed = 0;
+    pacman->moovement_speed = MOVEMENT_SPEED;
+    pacman->animation_frame = 3;
+}
 
 bool isAbleToGo(struct Wall *map, struct GameMap *game_map, int to_x, int to_y)
 {
