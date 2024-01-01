@@ -28,7 +28,7 @@ void initGhost(struct Ghost *ghost, struct GameMap *game_map)
     ghost->x = ghost->x_block_cordinates * BLOCK_SIZE;
     ghost->y = ghost->y_block_cordinates * BLOCK_SIZE;
 
-    ghost->moovement_speed = MOVEMENT_SPEED;
+    ghost->moovement_speed = MOVEMENT_SPEED * 0.75;
     ghost->x_speed = ghost->moovement_speed;
     ghost->y_speed = 0;
 
@@ -56,52 +56,38 @@ void drawGhost(struct SDL_Renderer *renderer, struct Ghost *ghost, struct GameMa
 
 void redGhostMove(struct Ghost *ghost, struct GameMap *game_map, struct Pacman *pacman, double delta_time, struct Wall *walls)
 {
-    double top_distance = (game_map->pixel_height + game_map->pixel_width) * 2;
-    double bottom_distance = (game_map->pixel_height + game_map->pixel_width) * 2;
-    double right_distance = (game_map->pixel_height + game_map->pixel_width) * 2;
-    double left_distance = (game_map->pixel_height + game_map->pixel_width) * 2;
-    if (ghost->x_speed > 0)
-    {
-        if (isAbleToGo(walls, game_map, ghost->x_block_cordinates, ghost->y_block_cordinates - 1))
-        {
-            top_distance = sqrt(pow(ghost->x_block_cordinates - pacman->x_block_cordinates, 2) + pow(ghost->y_block_cordinates - 1 - pacman->y_block_cordinates, 2));
-        }
-        if (isAbleToGo(walls, game_map, ghost->x_block_cordinates, ghost->y_block_cordinates + 1))
-        {
-            bottom_distance = sqrt(pow(ghost->x_block_cordinates - pacman->x_block_cordinates, 2) + pow(ghost->y_block_cordinates + 1 - pacman->y_block_cordinates, 2));
-        }
-        if (isAbleToGo(walls, game_map, ghost->x_block_cordinates + 1, ghost->y_block_cordinates))
-        {
-            right_distance = sqrt(pow(ghost->x_block_cordinates + 1 - pacman->x_block_cordinates, 2) + pow(ghost->y_block_cordinates - pacman->y_block_cordinates, 2));
-        }
-    }
-    else if (ghost->x_speed < 0)
-    {
-    }
+    double top_distance = sqrt(pow(ghost->x_block_cordinates - pacman->x_block_cordinates, 2) + pow(ghost->y_block_cordinates - 1 - pacman->y_block_cordinates, 2));
+    double bottom_distance = sqrt(pow(ghost->x_block_cordinates - pacman->x_block_cordinates, 2) + pow(ghost->y_block_cordinates + 1 - pacman->y_block_cordinates, 2));
+    double right_distance = sqrt(pow(ghost->x_block_cordinates + 1 - pacman->x_block_cordinates, 2) + pow(ghost->y_block_cordinates - pacman->y_block_cordinates, 2));
+    double left_distance = sqrt(pow(ghost->x_block_cordinates - 1 - pacman->x_block_cordinates, 2) + pow(ghost->y_block_cordinates - pacman->y_block_cordinates, 2));
+    bool able_top = isAbleToGo(walls, game_map, ghost->x_block_cordinates, ghost->y_block_cordinates - 1) && !(ghost->y_speed > 0);
+    bool able_bottom = isAbleToGo(walls, game_map, ghost->x_block_cordinates, ghost->y_block_cordinates + 1) && !(ghost->y_speed < 0);
+    bool able_right = isAbleToGo(walls, game_map, ghost->x_block_cordinates + 1, ghost->y_block_cordinates) && !(ghost->x_speed < 0);
+    bool able_left = isAbleToGo(walls, game_map, ghost->x_block_cordinates - 1, ghost->y_block_cordinates) && !(ghost->x_speed > 0);
 
-    if (top_distance < bottom_distance && top_distance < right_distance && top_distance < left_distance)
+    // if (((top_distance <= bottom_distance) * able_bottom) && ((top_distance <= right_distance) * able_right) && ((top_distance <= left_distance) * able_left) && able_top)
+
+    if (able_top && ((top_distance <= bottom_distance) || !able_bottom) && ((top_distance <= left_distance) || !able_left) && ((top_distance <= right_distance) || !able_right))
     {
         ghost->x_speed = 0;
         ghost->y_speed = -ghost->moovement_speed;
     }
-    else if (bottom_distance < top_distance && bottom_distance < right_distance && bottom_distance < left_distance)
+    else if (able_bottom && ((bottom_distance <= top_distance) || !able_top) && ((bottom_distance <= left_distance) || !able_left) && ((bottom_distance <= right_distance) || !able_right))
     {
         ghost->x_speed = 0;
         ghost->y_speed = ghost->moovement_speed;
     }
-    else if (right_distance < top_distance && right_distance < bottom_distance && right_distance < left_distance)
+    else if (able_right && ((right_distance <= bottom_distance) || !able_bottom) && ((right_distance <= left_distance) || !able_left) && ((right_distance <= top_distance) || !able_top))
     {
         ghost->x_speed = ghost->moovement_speed;
         ghost->y_speed = 0;
     }
-    else if (left_distance < top_distance && left_distance < bottom_distance && left_distance < right_distance)
+    else if (able_left && ((left_distance <= bottom_distance) || !able_bottom) && ((left_distance <= right_distance) || !able_right) && ((left_distance <= top_distance) || !able_top))
     {
         ghost->x_speed = -ghost->moovement_speed;
         ghost->y_speed = 0;
     }
-    //     printf("top_distance: %lf\n", top_distance);
-    // printf("bottom_distance: %lf\n", bottom_distance);
-    // printf("right_distance: %lf\n", right_distance);
+
     ghost->x = round(ghost->x + ghost->x_speed * delta_time);
     ghost->y = round(ghost->y + ghost->y_speed * delta_time);
 
