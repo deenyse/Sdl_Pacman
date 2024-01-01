@@ -23,12 +23,14 @@ struct Ghost
 
 void initGhost(struct Ghost *ghost, struct GameMap *game_map)
 {
-    ghost->x = 14 * BLOCK_SIZE - BLOCK_SIZE / 2 + game_map->bottom_margin;
-    ghost->y = 18 * BLOCK_SIZE;
+    ghost->x_block_cordinates = 18;
+    ghost->y_block_cordinates = 17;
+    ghost->x = ghost->x_block_cordinates * BLOCK_SIZE;
+    ghost->y = ghost->y_block_cordinates * BLOCK_SIZE;
 
-    ghost->x_speed = 0;
+    ghost->moovement_speed = MOVEMENT_SPEED;
+    ghost->x_speed = ghost->moovement_speed;
     ghost->y_speed = 0;
-    ghost->moovement_speed = 0;
 
     ghost->animation_frame = 0;
     ghost->tiles[0] = NULL;
@@ -39,12 +41,108 @@ void initGhost(struct Ghost *ghost, struct GameMap *game_map)
     ghost->isAfraid = false;
     ghost->character = 'r';
 }
-void drawGhost(struct SDL_Renderer *renderer, struct Ghost *ghost)
+void drawGhost(struct SDL_Renderer *renderer, struct Ghost *ghost, struct GameMap *game_map)
 {
     // draw ghost image hitbox
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
     SDL_Rect ghost_box = {.x = ghost->x, .y = ghost->y, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
     SDL_RenderFillRect(renderer, &ghost_box);
+
+    // draw ghost position map(greeen)
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+    SDL_Rect ghost_box1 = {.x = ghost->x_block_cordinates * BLOCK_SIZE, .y = ghost->y_block_cordinates * BLOCK_SIZE + game_map->top_margin, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
+    SDL_RenderFillRect(renderer, &ghost_box1);
+}
+
+void redGhostMove(struct Ghost *ghost, struct GameMap *game_map, struct Pacman *pacman, double delta_time, struct Wall *walls)
+{
+    double top_distance = (game_map->pixel_height + game_map->pixel_width) * 2;
+    double bottom_distance = (game_map->pixel_height + game_map->pixel_width) * 2;
+    double right_distance = (game_map->pixel_height + game_map->pixel_width) * 2;
+    double left_distance = (game_map->pixel_height + game_map->pixel_width) * 2;
+    if (ghost->x_speed > 0)
+    {
+        if (isAbleToGo(walls, game_map, ghost->x_block_cordinates, ghost->y_block_cordinates - 1))
+        {
+            top_distance = sqrt(pow(ghost->x_block_cordinates - pacman->x_block_cordinates, 2) + pow(ghost->y_block_cordinates - 1 - pacman->y_block_cordinates, 2));
+        }
+        if (isAbleToGo(walls, game_map, ghost->x_block_cordinates, ghost->y_block_cordinates + 1))
+        {
+            bottom_distance = sqrt(pow(ghost->x_block_cordinates - pacman->x_block_cordinates, 2) + pow(ghost->y_block_cordinates + 1 - pacman->y_block_cordinates, 2));
+        }
+        if (isAbleToGo(walls, game_map, ghost->x_block_cordinates + 1, ghost->y_block_cordinates))
+        {
+            right_distance = sqrt(pow(ghost->x_block_cordinates + 1 - pacman->x_block_cordinates, 2) + pow(ghost->y_block_cordinates - pacman->y_block_cordinates, 2));
+        }
+    }
+    else if (ghost->x_speed < 0)
+    {
+    }
+
+    if (top_distance < bottom_distance && top_distance < right_distance && top_distance < left_distance)
+    {
+        ghost->x_speed = 0;
+        ghost->y_speed = -ghost->moovement_speed;
+    }
+    else if (bottom_distance < top_distance && bottom_distance < right_distance && bottom_distance < left_distance)
+    {
+        ghost->x_speed = 0;
+        ghost->y_speed = ghost->moovement_speed;
+    }
+    else if (right_distance < top_distance && right_distance < bottom_distance && right_distance < left_distance)
+    {
+        ghost->x_speed = ghost->moovement_speed;
+        ghost->y_speed = 0;
+    }
+    else if (left_distance < top_distance && left_distance < bottom_distance && left_distance < right_distance)
+    {
+        ghost->x_speed = -ghost->moovement_speed;
+        ghost->y_speed = 0;
+    }
+    //     printf("top_distance: %lf\n", top_distance);
+    // printf("bottom_distance: %lf\n", bottom_distance);
+    // printf("right_distance: %lf\n", right_distance);
+    ghost->x = round(ghost->x + ghost->x_speed * delta_time);
+    ghost->y = round(ghost->y + ghost->y_speed * delta_time);
+
+    if (ghost->x_block_cordinates < -1)
+        ghost->x = game_map->pixel_width;
+    else if (ghost->x_block_cordinates > game_map->block_width)
+        ghost->x = -1 * BLOCK_SIZE;
+    else if (ghost->x_block_cordinates >= 0 && ghost->x_block_cordinates < game_map->block_width && ghost->y_block_cordinates >= 0 && ghost->y_block_cordinates < game_map->block_height)
+    {
+        if (ghost->x_speed > 0) // checks if ghost is in a wall // add general if x y is not out of border
+        {
+            if ((walls[ghost->y_block_cordinates * game_map->block_width + ghost->x_block_cordinates + 1].hitBox.x <= ghost->x + BLOCK_SIZE) && walls[ghost->y_block_cordinates * game_map->block_width + ghost->x_block_cordinates + 1].type >= 'a' && walls[ghost->y_block_cordinates * game_map->block_width + ghost->x_block_cordinates + 1].type <= 'x')
+            {
+                ghost->x = walls[ghost->y_block_cordinates * game_map->block_width + ghost->x_block_cordinates + 1].hitBox.x - BLOCK_SIZE;
+            }
+        }
+        else if (ghost->x_speed < 0)
+        {
+            if ((walls[ghost->y_block_cordinates * game_map->block_width + ghost->x_block_cordinates - 1].hitBox.x >= ghost->x - BLOCK_SIZE) && walls[ghost->y_block_cordinates * game_map->block_width + ghost->x_block_cordinates - 1].type >= 'a' && walls[ghost->y_block_cordinates * game_map->block_width + ghost->x_block_cordinates - 1].type <= 'x')
+            {
+                ghost->x = walls[ghost->y_block_cordinates * game_map->block_width + ghost->x_block_cordinates - 1].hitBox.x + BLOCK_SIZE;
+            }
+        }
+        else if (ghost->y_speed > 0)
+        {
+            if ((walls[(ghost->y_block_cordinates + 1) * game_map->block_width + ghost->x_block_cordinates].hitBox.y <= ghost->y + BLOCK_SIZE) && walls[(ghost->y_block_cordinates + 1) * game_map->block_width + ghost->x_block_cordinates].type >= 'a' && walls[(ghost->y_block_cordinates + 1) * game_map->block_width + ghost->x_block_cordinates].type <= 'x')
+            {
+                ghost->y = walls[(ghost->y_block_cordinates + 1) * game_map->block_width + ghost->x_block_cordinates].hitBox.y - BLOCK_SIZE;
+            }
+        }
+        else if (ghost->y_speed < 0)
+        {
+            if ((walls[(ghost->y_block_cordinates - 1) * game_map->block_width + ghost->x_block_cordinates].hitBox.y >= ghost->y - BLOCK_SIZE) && walls[(ghost->y_block_cordinates - 1) * game_map->block_width + ghost->x_block_cordinates].type >= 'a' && walls[(ghost->y_block_cordinates - 1) * game_map->block_width + ghost->x_block_cordinates].type <= 'x')
+            {
+                ghost->y = walls[(ghost->y_block_cordinates - 1) * game_map->block_width + ghost->x_block_cordinates].hitBox.y + BLOCK_SIZE;
+            }
+        }
+    }
+
+    ghost->x_block_cordinates = round((ghost->x / BLOCK_SIZE));
+    ghost->y_block_cordinates = round((ghost->y - game_map->top_margin) / BLOCK_SIZE);
 }
 int main()
 {
@@ -165,7 +263,7 @@ int main()
         mapUxDraw(renderer, map, &pacman, &game_map);
 
         // ghosts
-        drawGhost(renderer, &redGhost);
+        drawGhost(renderer, &redGhost, &game_map);
         // checking points
         if (game_map.collected_point_amount < game_map.point_amount)
         {
@@ -173,9 +271,10 @@ int main()
             pacmanMoove(&pacman, delta_time, &game_map, map);
             // pacman animate
             pacman_animate(&pacman, delta_time);
-
             //  check and collect intersected points
             point_collector(&pacman, &game_map, map);
+
+            redGhostMove(&redGhost, &game_map, &pacman, delta_time, map);
         }
         else
         {
