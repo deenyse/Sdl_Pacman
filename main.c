@@ -26,8 +26,7 @@ char **readIntegersFromFile(const char *filePath)
         int number;
         if (fscanf(file, "%d", &number) != 1)
         {
-            perror("Error reading integer from file");
-            exit(EXIT_FAILURE);
+            number = 0;
         }
 
         int stringSize = snprintf(NULL, 0, "%d", number);
@@ -44,6 +43,46 @@ char **readIntegersFromFile(const char *filePath)
 
     return integerStrings;
 }
+void insertNumber(char **array, int size, int num, const char *filename)
+{
+    int i;
+
+    // Convert the integer to string
+    char numStr[10];
+    sprintf(numStr, "%d", num);
+
+    // Find the correct position to insert the number
+    for (i = 0; i < size; i++)
+    {
+        if (atoi(array[i]) < num)
+        {
+            break;
+        }
+    }
+
+    // Open the file for writing
+    FILE *file = fopen(filename, "w");
+    if (file == NULL)
+    {
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
+
+    // Write the modified array to the file
+    for (int j = 0; j < size; j++)
+    {
+        if (j == i)
+        {
+            // Insert the new number at the correct position
+            fprintf(file, "%s\n", numStr);
+        }
+        fprintf(file, "%s\n", array[j]);
+    }
+
+    // Close the file
+    fclose(file);
+}
+
 void drawStartMenu(struct SDL_Renderer *renderer, char **top_positions)
 {
     printText(renderer, "Pacman", 0, 0, 141);
@@ -55,6 +94,8 @@ void drawStartMenu(struct SDL_Renderer *renderer, char **top_positions)
     }
     printText(renderer, "press any arrow to start", 5, 800, 40);
 }
+
+void drawVictoryScreen(struct SDL_Renderer *renderer, char **top_positions) {}
 Uint32 ghostRelease(Uint32 interval, void *param)
 {
     struct Ghost *ghost = (struct Ghost *)param;
@@ -254,7 +295,7 @@ int main()
             drawStartMenu(renderer, top_positions);
             draw_pacman(renderer, &pacman);
         }
-        else if (game_state >= 1)
+        else if (game_state >= 1 && game_state <= 4)
         {
             pacmanMoove(&pacman, delta_time, &game_map, map);
             pacman_animate(&pacman, delta_time);
@@ -271,6 +312,15 @@ int main()
             drawGhost(renderer, &pinkGhost, &game_map);
             drawGhost(renderer, &blueGhost, &game_map);
             drawGhost(renderer, &orangeGhost, &game_map);
+        }
+        else if (game_state == 5)
+        {
+            drawVictoryScreen(renderer, top_positions);
+        }
+        else if (game_state == 6)
+        {
+            printf("you loose");
+            // drawGameOverScreen(renderer, top_positions);
         }
         if (game_state == 0 && (key_left_pressed + key_right_pressed + key_up_pressed + key_down_pressed) > 0)
         {
@@ -293,13 +343,15 @@ int main()
             game_state = 4;
             ghostRelease(0, &orangeGhost);
         }
-        if (game_map.collected_point_amount < game_map.point_amount)
+        if (game_map.collected_point_amount >= game_map.point_amount && game_state != 0)
         {
-            printf("You won\n");
+            insertNumber(top_positions, 3, game_map.score, "results.txt");
+            game_state = 5;
         }
-        else if (pacman.lives == 0)
+        else if (pacman.lives <= 0 && game_state != 0)
         {
-            printf("you lose\n");
+            insertNumber(top_positions, 3, game_map.score, "results.txt");
+            game_state = 6;
         }
 
         SDL_RenderPresent(renderer);
