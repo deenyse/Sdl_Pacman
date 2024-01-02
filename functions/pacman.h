@@ -85,7 +85,6 @@ Uint32 timerCallback(Uint32 interval, void *param)
     {
         pacman->moovement_speed = MOVEMENT_SPEED;
         pacman->isKilling = false;
-        printf("pacman is not killing\n");
     }
 
     pacman->timer_amount--;
@@ -99,8 +98,6 @@ void point_collector(struct Pacman *pacman, struct GameMap *map, struct Wall *wa
     {
         if (walls[pacman->y_block_cordinates * map->block_width + pacman->x_block_cordinates].type == 'Z')
         {
-            printf("pacman is killing\n");
-
             pacman->isKilling = true;
             pacman->moovement_speed = MOVEMENT_SPEED * 1.15;
 

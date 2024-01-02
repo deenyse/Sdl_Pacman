@@ -3,7 +3,7 @@
 
 #include "init.h"
 #include "pacman.h"
-
+#include "ghost.h"
 void WindowGameInit(struct GameMap *game_map, struct Pacman *pacman, SDL_Window **window, SDL_Renderer **renderer)
 {
     game_map->block_width = 28;
@@ -145,5 +145,136 @@ void ImageInit(struct Pacman *pacman, struct Wall **map, SDL_Renderer *renderer,
 {
     *map = readMapFromFile("map.txt", game_map, renderer);
     initPacmanTiles(renderer, pacman);
+}
+
+char **readIntegersFromFile(const char *filePath)
+{
+    FILE *file = fopen(filePath, "r");
+    if (file == NULL)
+    {
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
+
+    char **integerStrings = (char **)malloc(3 * sizeof(char *));
+    if (integerStrings == NULL)
+    {
+        perror("Memory allocation error");
+        exit(EXIT_FAILURE);
+    }
+
+    for (int i = 0; i < 3; ++i)
+    {
+
+        int number;
+        if (fscanf(file, "%d", &number) != 1)
+        {
+            number = 0;
+        }
+
+        int stringSize = snprintf(NULL, 0, "%d", number);
+        integerStrings[i] = (char *)malloc((stringSize + 1) * sizeof(char));
+        if (integerStrings[i] == NULL)
+        {
+            perror("Memory allocation error");
+            exit(EXIT_FAILURE);
+        }
+        snprintf(integerStrings[i], stringSize + 1, "%d", number);
+    }
+
+    fclose(file);
+
+    return integerStrings;
+}
+void insertNumber(char **array, int size, int num, const char *filename)
+{
+    int i;
+    char numStr[10];
+    snprintf(numStr, sizeof(numStr), "%d", num);
+    for (i = 0; i < size; i++)
+    {
+        if (atoi(array[i]) < num)
+        {
+            break;
+        }
+    }
+    FILE *file = fopen(filename, "w");
+    if (file == NULL)
+    {
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
+    for (int j = 0; j < size; j++)
+    {
+        if (j == i)
+        {
+            fprintf(file, "%s\n", numStr);
+        }
+        fprintf(file, "%s\n", array[j]);
+    }
+    fclose(file);
+}
+
+bool creatureIntersection(struct Pacman *pacman, struct Ghost *ghost)
+{
+    return (pacman->x_block_cordinates == ghost->x_block_cordinates && pacman->y_block_cordinates == ghost->y_block_cordinates);
+}
+
+void intersectionMechanik(struct Pacman *pacman, struct Ghost *redGhost, struct Ghost *pinkGhost, struct Ghost *blueGhost, struct Ghost *orangeGhost, struct GameMap *game_map, int game_state)
+{
+    if (pacman->isKilling)
+    {
+        if (creatureIntersection(pacman, redGhost))
+        {
+            game_map->score += 200;
+            initRedGhost(redGhost);
+            SDL_AddTimer(2000, ghostRelease, redGhost);
+        }
+        else if (creatureIntersection(pacman, pinkGhost))
+        {
+            game_map->score += 200;
+            initPinkGhost(pinkGhost);
+            SDL_AddTimer(2000, ghostRelease, pinkGhost);
+        }
+        else if (creatureIntersection(pacman, blueGhost))
+        {
+            game_map->score += 200;
+            initBlueGhost(blueGhost);
+            SDL_AddTimer(2000, ghostRelease, blueGhost);
+        }
+        else if (creatureIntersection(pacman, orangeGhost))
+        {
+            game_map->score += 200;
+            initOrangeGhost(orangeGhost);
+            SDL_AddTimer(2000, ghostRelease, orangeGhost);
+        }
+    }
+    else
+    {
+        if (creatureIntersection(pacman, redGhost) || creatureIntersection(pacman, pinkGhost) || creatureIntersection(pacman, blueGhost) || creatureIntersection(pacman, orangeGhost))
+        {
+            pacman->lives--;
+            pacman->x = 14 * BLOCK_SIZE - BLOCK_SIZE / 2;
+            pacman->y = 20 * BLOCK_SIZE;
+            pacman->x_speed = 0;
+            pacman->y_speed = 0;
+            if (game_state >= 1)
+            {
+                ghostRelease(0, redGhost);
+            }
+            if (game_state >= 2)
+            {
+                ghostRelease(0, pinkGhost);
+            }
+            if (game_state >= 3)
+            {
+                ghostRelease(0, blueGhost);
+            }
+            if (game_state >= 4)
+            {
+                ghostRelease(0, orangeGhost);
+            }
+        }
+    }
 }
 #endif

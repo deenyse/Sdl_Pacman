@@ -160,4 +160,30 @@ void drawGhost(struct SDL_Renderer *renderer, struct Ghost *ghost)
         SDL_RenderFillRect(renderer, &ghost_box);
     }
 }
+
+void drawStartMenu(struct SDL_Renderer *renderer, char **top_positions)
+{
+    printText(renderer, "Pacman", 0, 0, 141);
+    printText(renderer, "Top 3:", 260, 200, 40);
+
+    for (int i = 0; i < 3; ++i)
+    {
+        printText(renderer, top_positions[i], 260, 240 + 40 * i, 40);
+    }
+    printText(renderer, "press any arrow to start", 5, 800, 40);
+}
+
+void drawVictoryScreen(struct SDL_Renderer *renderer)
+{
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    printText(renderer, "You Win", 260, 200, 60);
+}
+void drawLooseScreen(struct SDL_Renderer *renderer)
+{
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    printText(renderer, "You Loose", 260, 200, 60);
+}
+
 #endif

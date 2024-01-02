@@ -1,3 +1,6 @@
+#ifndef Ghost_h
+#define Ghost_h
+
 #include "init.h"
 #include "pacman.h"
 
@@ -253,3 +256,14 @@ void mooveOrangeGhost(struct Ghost *ghost, struct GameMap *game_map, double delt
         }
     }
 }
+Uint32 ghostRelease(Uint32 interval, void *param)
+{
+    struct Ghost *ghost = (struct Ghost *)param;
+    ghost->x = 13 * BLOCK_SIZE;
+    ghost->y = 14 * BLOCK_SIZE;
+    ghost->isActive = true;
+    interval = 0;
+    return interval;
+}
+
+#endif
