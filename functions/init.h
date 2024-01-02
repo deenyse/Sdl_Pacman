@@ -28,6 +28,7 @@ struct Pacman
 
     int lives;
     bool isKilling;
+    int timer_amount;
 
 } Pacman;
 struct Wall

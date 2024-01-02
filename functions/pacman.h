@@ -13,6 +13,7 @@ void initializePacman(struct Pacman *pacman, struct GameMap *game_map)
     pacman->moovement_speed = MOVEMENT_SPEED;
     pacman->animation_frame = 3;
     pacman->isKilling = false;
+    pacman->timer_amount = 0;
 }
 
 bool isAbleToGo(struct Wall *map, struct GameMap *game_map, int to_x, int to_y)
@@ -79,11 +80,15 @@ Uint32 timerCallback(Uint32 interval, void *param)
     // Cast the void pointer back to the original struct type
     struct Pacman *pacman = (struct MyStruct *)param;
 
-    pacman->moovement_speed = MOVEMENT_SPEED;
-    pacman->isKilling = false;
-    printf("pacman is not killing\n");
+    if (pacman->timer_amount == 1)
+    {
+        pacman->moovement_speed = MOVEMENT_SPEED;
+        pacman->isKilling = false;
+        printf("pacman is not killing\n");
+    }
 
     // Returning 0 will stop the timer
+    pacman->timer_amount--;
     return 0;
 }
 
@@ -96,6 +101,7 @@ void point_collector(struct Pacman *pacman, struct GameMap *map, struct Wall *wa
             pacman->isKilling = true;
             pacman->moovement_speed *= 1.15;
             printf("pacman is killing\n");
+            pacman->timer_amount++;
             SDL_TimerID timerID = SDL_AddTimer(4000, timerCallback, pacman);
         }
         walls[pacman->y_block_cordinates * map->block_width + pacman->x_block_cordinates].show = false;

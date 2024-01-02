@@ -1,12 +1,12 @@
 daaaaaaaaaaaacdaaaaaaaaaaaac
 fzzzzzzzzzzzzfezzzzzzzzzzzze
-fzdaaczdaaaczfezdaaaczdaacze
+fZdaaczdaaaczfezdaaaczdaacZe
 fzf  ezf   ezfezf   ezf  eze
 fzibbjzibbbjzijzibbbjzibbjze
 fzzzzzzzzzzzzzzzzzzzzzzzzzze
 fzdaaczdczdaaaaaaczdczdaacze
 fzibbjzfezibbcdbbjzfezibbjze
-fzzzzzzfezzzzfezzzzfezzzzzze
+fzzzzzzfeZzzzfezzzZfezzzzzze
 haaaaczfiaac fe daajezdaaaag
      ezfdbbj ij ibbcezf     
      ezfe          fezf     
@@ -15,17 +15,17 @@ bbbbbjzhg w      x hgzibbbbb
       z   w      x   z      
 aaaaaczdc w      x dczdaaaaa
      ezfe tkkkkkks fezf     
-     ezfe          feZf     
+     ezfe          fezf     
      ezfe daaaaaac fezf     
 dbbbbjzij ibbcdbbj ijzibbbbc
-fzzzzzzzzzzzzfezzzzzzZzzzzze
+fzzzzzZzzzzzzfezzzzzzZzzzzze
 fzdaaczdaaaczfezdaaaczdaacze
 fzibcezibbbjzijzibbbjzfdbjze
 fzzzfezzzzzzz  zzzzzzzfezzze
 iaczfezdczdaaaaaaczdczfezdaj
 dbjzijzfezibbcdbbjzfezijzibc
 fzzzzzzfezzzzfezzzzfezzzzzze
-fzdaaaajiaaczfezdaajiaaaacze
+fZdaaaajiaaczfezdaajiaaaacZe
 fzibbbbbbbbjzijzibbbbbbbbjze
 fzzzzzzzzzzzzzzzzzzzzzzzzzze
 ibbbbbbbbbbbbbbbbbbbbbbbbbbj

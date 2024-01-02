@@ -39,7 +39,7 @@ int main()
     bool key_down_pressed = false;
     bool key_left_pressed = false;
     bool key_right_pressed = false;
-    //.
+
     while (running)
     {
         while (SDL_PollEvent(&event))
@@ -165,7 +165,6 @@ int main()
 
             if (game_map.collected_point_amount == (int)(game_map.point_amount * 0.6))
             {
-
                 game_state = 4;
                 orangeGhost.isActive = true;
                 ghostRelease(&orangeGhost);
@@ -178,7 +177,7 @@ int main()
         // update renderer
         SDL_RenderPresent(renderer);
     }
-    ////////.......///////////////
+    ////////......./////////////////////
     // Uvolnění prostředků
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
