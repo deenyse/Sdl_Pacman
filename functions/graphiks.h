@@ -5,6 +5,20 @@
 
 #include <SDL2/SDL.h>
 
+char *intToStringWithScore(int number)
+{
+    // Determine the length of the string representation
+    int length = snprintf(NULL, 0, "score:%d", number);
+
+    // Allocate memory for the string representation
+    char *result = (char *)malloc(length + 1); // +1 for the null terminator
+
+    // Convert the integer to a string with "score:" prefix
+    snprintf(result, length + 1, "score:%d", number);
+
+    return result;
+}
+
 void renderImage(SDL_Renderer *renderer, SDL_Texture *texture, int to_x, int to_y, int height, int width, double angle)
 {
     // Create source and destination rectangles
@@ -91,7 +105,7 @@ void drawPacmanLives(SDL_Renderer *renderer, struct Pacman *pacman)
     }
 }
 
-void mapUxDraw(SDL_Renderer *renderer, struct Wall *map, struct Pacman *pacman, struct GameMap *game_map)
+void mapUxDraw(SDL_Renderer *renderer, struct Wall *map, struct Pacman *pacman, struct GameMap *game_map, char **top_positions)
 {
     // draw background
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
@@ -110,18 +124,15 @@ void mapUxDraw(SDL_Renderer *renderer, struct Wall *map, struct Pacman *pacman, 
     //  SDL_Rect pacman_box = {.x = pacman->x, .y = pacman->y, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
     //  SDL_RenderFillRect(renderer, &pacman_box);
 
-    // draw pacman
-    if (pacman->x_speed > 0)
-        renderImage(renderer, pacman->tiles[(int)pacman->animation_frame], pacman->x, pacman->y, BLOCK_SIZE, BLOCK_SIZE, 180);
-    else if (pacman->x_speed < 0)
-        renderImage(renderer, pacman->tiles[(int)pacman->animation_frame], pacman->x, pacman->y, BLOCK_SIZE, BLOCK_SIZE, 0);
-    else if (pacman->y_speed > 0)
-        renderImage(renderer, pacman->tiles[(int)pacman->animation_frame], pacman->x, pacman->y, BLOCK_SIZE, BLOCK_SIZE, 270);
-    else
-        renderImage(renderer, pacman->tiles[(int)pacman->animation_frame], pacman->x, pacman->y, BLOCK_SIZE, BLOCK_SIZE, 90);
     // print score
-    printText(renderer, "High score:1000", 0, 0, 36);
-    printText(renderer, "Score:2000", 0, 36, 36);
+    char *currentScore = intToStringWithScore(game_map->score);
+    char highScoreString[strlen("High score:") + strlen(top_positions[0]) + 1];
+    strcpy(highScoreString, "High score:");
+    strcat(highScoreString, top_positions[0]);
+
+    printText(renderer, highScoreString, 0, 0, 36);
+    printText(renderer, currentScore, 0, 36, 36);
+    free(currentScore);
 
     // print lives
     drawPacmanLives(renderer, pacman);

@@ -2,7 +2,8 @@
 #define Pacman_h
 
 #include "init.h"
-void initializePacman(struct Pacman *pacman, struct GameMap *game_map)
+#include "graphiks.h"
+void initializePacman(struct Pacman *pacman)
 {
     pacman->x_block_cordinates = 14;
     pacman->y_block_cordinates = 17;
@@ -78,7 +79,7 @@ void pacmanMoove(struct Pacman *pacman, double delta_time, struct GameMap *map, 
 Uint32 timerCallback(Uint32 interval, void *param)
 {
     // Cast the void pointer back to the original struct type
-    struct Pacman *pacman = (struct MyStruct *)param;
+    struct Pacman *pacman = (struct Pacman *)param;
 
     if (pacman->timer_amount == 1)
     {
@@ -87,7 +88,6 @@ Uint32 timerCallback(Uint32 interval, void *param)
         printf("pacman is not killing\n");
     }
 
-    // Returning 0 will stop the timer
     pacman->timer_amount--;
     return 0;
 }
@@ -98,15 +98,18 @@ void point_collector(struct Pacman *pacman, struct GameMap *map, struct Wall *wa
     {
         if (walls[pacman->y_block_cordinates * map->block_width + pacman->x_block_cordinates].type == 'Z')
         {
-            pacman->isKilling = true;
-            pacman->moovement_speed *= 1.15;
             printf("pacman is killing\n");
+
+            pacman->isKilling = true;
+            pacman->moovement_speed = MOVEMENT_SPEED * 1.15;
+
             pacman->timer_amount++;
-            SDL_TimerID timerID = SDL_AddTimer(4000, timerCallback, pacman);
+            SDL_AddTimer(4000, timerCallback, pacman);
+            map->score += 20;
         }
         walls[pacman->y_block_cordinates * map->block_width + pacman->x_block_cordinates].show = false;
         map->collected_point_amount++;
-        printf("collected %d points\n", map->collected_point_amount);
+        map->score += 50;
     }
 }
 
@@ -120,5 +123,18 @@ void pacman_animate(struct Pacman *pacman, double delta_time)
     {
         pacman->animation_frame = 0;
     }
+}
+
+void draw_pacman(SDL_Renderer *renderer, struct Pacman *pacman)
+{
+    // draw pacman
+    if (pacman->x_speed > 0)
+        renderImage(renderer, pacman->tiles[(int)pacman->animation_frame], pacman->x, pacman->y, BLOCK_SIZE, BLOCK_SIZE, 180);
+    else if (pacman->x_speed < 0)
+        renderImage(renderer, pacman->tiles[(int)pacman->animation_frame], pacman->x, pacman->y, BLOCK_SIZE, BLOCK_SIZE, 0);
+    else if (pacman->y_speed > 0)
+        renderImage(renderer, pacman->tiles[(int)pacman->animation_frame], pacman->x, pacman->y, BLOCK_SIZE, BLOCK_SIZE, 270);
+    else
+        renderImage(renderer, pacman->tiles[(int)pacman->animation_frame], pacman->x, pacman->y, BLOCK_SIZE, BLOCK_SIZE, 90);
 }
 #endif

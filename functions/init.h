@@ -60,7 +60,7 @@ struct GameMap
 
     int point_amount;
     int collected_point_amount;
-
+    int score;
 } GameMap;
 struct Ghost
 {

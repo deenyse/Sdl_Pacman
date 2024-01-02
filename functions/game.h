@@ -15,8 +15,8 @@ void WindowGameInit(struct GameMap *game_map, struct Pacman *pacman, SDL_Window 
     game_map->bottom_margin = BLOCK_SIZE * 2;
     game_map->point_amount = 0;
     game_map->collected_point_amount = 0;
-
-    initializePacman(pacman, game_map);
+    game_map->score = 0;
+    initializePacman(pacman);
 
     SDL_Init(SDL_INIT_VIDEO);
 

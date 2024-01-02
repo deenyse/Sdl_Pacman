@@ -3,7 +3,104 @@
 #include "functions/pacman.h"
 #include "functions/init.h"
 #include "functions/ghost.h"
+char **readIntegersFromFile(const char *filePath)
+{
+    FILE *file = fopen(filePath, "r");
+    if (file == NULL)
+    {
+        perror("Error opening file");
+        exit(EXIT_FAILURE);
+    }
 
+    char **integerStrings = (char **)malloc(3 * sizeof(char *));
+    if (integerStrings == NULL)
+    {
+        perror("Memory allocation error");
+        exit(EXIT_FAILURE);
+    }
+
+    for (int i = 0; i < 3; ++i)
+    {
+
+        int number;
+        if (fscanf(file, "%d", &number) != 1)
+        {
+            perror("Error reading integer from file");
+            exit(EXIT_FAILURE);
+        }
+
+        int stringSize = snprintf(NULL, 0, "%d", number);
+        integerStrings[i] = (char *)malloc((stringSize + 1) * sizeof(char));
+        if (integerStrings[i] == NULL)
+        {
+            perror("Memory allocation error");
+            exit(EXIT_FAILURE);
+        }
+        snprintf(integerStrings[i], stringSize + 1, "%d", number);
+    }
+
+    fclose(file);
+
+    return integerStrings;
+}
+void drawStartMenu(struct SDL_Renderer *renderer, char **top_positions)
+{
+    printText(renderer, "Pacman", 0, 0, 141);
+    printText(renderer, "Top 3:", 260, 200, 40);
+
+    for (int i = 0; i < 3; ++i)
+    {
+        printText(renderer, top_positions[i], 260, 240 + 40 * i, 40);
+    }
+    printText(renderer, "press any arrow to start", 5, 800, 40);
+}
+Uint32 ghostRelease(Uint32 interval, void *param)
+{
+    struct Ghost *ghost = (struct Ghost *)param;
+    ghost->x = 13 * BLOCK_SIZE;
+    ghost->y = 14 * BLOCK_SIZE;
+    ghost->isActive = true;
+    return 0;
+}
+
+bool creatureIntersection(struct Pacman *pacman, struct Ghost *ghost)
+{
+    return (pacman->x_block_cordinates == ghost->x_block_cordinates && pacman->y_block_cordinates == ghost->y_block_cordinates);
+}
+
+void intersectionMechanik(struct Pacman *pacman, struct Ghost *redGhost, struct Ghost *pinkGhost, struct Ghost *blueGhost, struct Ghost *orangeGhost, struct GameMap *game_map)
+{
+    if (pacman->isKilling)
+    {
+        if (creatureIntersection(pacman, redGhost))
+        {
+            game_map->score += 200;
+            initRedGhost(redGhost);
+            SDL_AddTimer(2000, ghostRelease, redGhost);
+        }
+        else if (creatureIntersection(pacman, pinkGhost))
+        {
+            game_map->score += 200;
+            initPinkGhost(pinkGhost);
+            SDL_AddTimer(2000, ghostRelease, pinkGhost);
+        }
+        else if (creatureIntersection(pacman, blueGhost))
+        {
+            game_map->score += 200;
+            initBlueGhost(blueGhost);
+            SDL_AddTimer(2000, ghostRelease, blueGhost);
+        }
+        else if (creatureIntersection(pacman, orangeGhost))
+        {
+            game_map->score += 200;
+            initOrangeGhost(orangeGhost);
+            SDL_AddTimer(2000, ghostRelease, orangeGhost);
+        }
+    }
+    else
+    {
+    }
+}
 int main()
 {
     struct Ghost redGhost;
@@ -11,13 +108,15 @@ int main()
     struct Ghost blueGhost;
     struct Ghost orangeGhost;
     struct GameMap game_map;
-    struct Pacman pacman = {.lives = 4};
+    struct Pacman pacman = {.lives = 3};
     struct Wall *map = NULL;
 
     initRedGhost(&redGhost);
     initPinkGhost(&pinkGhost);
     initBlueGhost(&blueGhost);
     initOrangeGhost(&orangeGhost);
+    ghostRelease(0, &redGhost);
+    redGhost.isActive = false;
 
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
@@ -25,6 +124,7 @@ int main()
     WindowGameInit(&game_map, &pacman, &window, &renderer);
 
     ImageInit(&pacman, &map, renderer, &game_map);
+    char **top_positions = readIntegersFromFile("results.txt");
 
     int game_state = 0;
     bool running = true;
@@ -33,7 +133,7 @@ int main()
     Uint64 delta_now = SDL_GetPerformanceCounter();
     Uint64 delta_last = 0;
     double delta_time = 0;
-
+    //
     // keys
     bool key_up_pressed = false;
     bool key_down_pressed = false;
@@ -128,14 +228,12 @@ int main()
 
         if (game_map.collected_point_amount < game_map.point_amount)
         {
-
-            mapUxDraw(renderer, map, &pacman, &game_map);
-            drawGhost(renderer, &redGhost, &game_map);
-            drawGhost(renderer, &pinkGhost, &game_map);
-            drawGhost(renderer, &blueGhost, &game_map);
-            drawGhost(renderer, &orangeGhost, &game_map);
-
-            if (game_state >= 1)
+            if (game_state == 0)
+            {
+                drawStartMenu(renderer, top_positions);
+                draw_pacman(renderer, &pacman);
+            }
+            else if (game_state >= 1)
             {
                 pacmanMoove(&pacman, delta_time, &game_map, map);
                 pacman_animate(&pacman, delta_time);
@@ -144,6 +242,14 @@ int main()
                 moovePinkGhost(&pinkGhost, &game_map, delta_time, map, &pacman);
                 mooveBlueGhost(&blueGhost, &game_map, delta_time, map, &pacman, &redGhost);
                 mooveOrangeGhost(&orangeGhost, &game_map, delta_time, map, &pacman);
+                intersectionMechanik(&pacman, &redGhost, &pinkGhost, &blueGhost, &orangeGhost, &game_map);
+
+                mapUxDraw(renderer, map, &pacman, &game_map, top_positions);
+                draw_pacman(renderer, &pacman);
+                drawGhost(renderer, &redGhost, &game_map);
+                drawGhost(renderer, &pinkGhost, &game_map);
+                drawGhost(renderer, &blueGhost, &game_map);
+                drawGhost(renderer, &orangeGhost, &game_map);
             }
             if (game_state == 0 && (key_left_pressed + key_right_pressed + key_up_pressed + key_down_pressed) > 0)
             {
@@ -153,21 +259,18 @@ int main()
             if (game_map.collected_point_amount == (int)(game_map.point_amount * 0.2))
             {
                 game_state = 2;
-                pinkGhost.isActive = true;
-                ghostRelease(&pinkGhost);
+                ghostRelease(0, &pinkGhost);
             }
             if (game_map.collected_point_amount == (int)(game_map.point_amount * 0.4))
             {
                 game_state = 3;
-                blueGhost.isActive = true;
-                ghostRelease(&blueGhost);
+                ghostRelease(0, &blueGhost);
             }
 
             if (game_map.collected_point_amount == (int)(game_map.point_amount * 0.6))
             {
                 game_state = 4;
-                orangeGhost.isActive = true;
-                ghostRelease(&orangeGhost);
+                ghostRelease(0, &orangeGhost);
             }
         }
         else

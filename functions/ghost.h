@@ -3,8 +3,8 @@
 
 void initRedGhost(struct Ghost *ghost)
 {
-    ghost->x_block_cordinates = 13;
-    ghost->y_block_cordinates = 11;
+    ghost->x_block_cordinates = 12;
+    ghost->y_block_cordinates = 14;
     ghost->x = ghost->x_block_cordinates * BLOCK_SIZE;
     ghost->y = (ghost->y_block_cordinates + 3) * BLOCK_SIZE;
 
@@ -162,11 +162,14 @@ void ghostMove(struct Ghost *ghost, struct GameMap *game_map, double delta_time,
 void mooveRedGhost(struct Ghost *ghost, struct GameMap *game_map, double delta_time, struct Wall *walls, struct Pacman *pacman)
 {
     if (ghost->isActive)
+    {
         ghostMove(ghost, game_map, delta_time, walls, pacman->x_block_cordinates, pacman->y_block_cordinates);
+    }
 }
 void moovePinkGhost(struct Ghost *ghost, struct GameMap *game_map, double delta_time, struct Wall *walls, struct Pacman *pacman)
 {
     if (ghost->isActive)
+    {
         if (pacman->y_speed < 0)
         {
             ghostMove(ghost, game_map, delta_time, walls, pacman->x_block_cordinates - 4, pacman->y_block_cordinates - 4);
@@ -183,10 +186,12 @@ void moovePinkGhost(struct Ghost *ghost, struct GameMap *game_map, double delta_
         {
             ghostMove(ghost, game_map, delta_time, walls, pacman->x_block_cordinates + 4, pacman->y_block_cordinates);
         }
+    }
 }
 void mooveBlueGhost(struct Ghost *ghost, struct GameMap *game_map, double delta_time, struct Wall *walls, struct Pacman *pacman, struct Ghost *red_ghost)
 {
     if (ghost->isActive)
+    {
         if (pacman->y_speed < 0)
         {
             ghostMove(ghost, game_map, delta_time, walls, 2 * (pacman->x_block_cordinates - 2) - red_ghost->x_block_cordinates, 2 * (pacman->y_block_cordinates - 2) - red_ghost->y_block_cordinates);
@@ -203,10 +208,12 @@ void mooveBlueGhost(struct Ghost *ghost, struct GameMap *game_map, double delta_
         {
             ghostMove(ghost, game_map, delta_time, walls, 2 * (pacman->x_block_cordinates + 2) - red_ghost->x_block_cordinates, 2 * (pacman->y_block_cordinates) - red_ghost->y_block_cordinates);
         }
+    }
 }
 void mooveOrangeGhost(struct Ghost *ghost, struct GameMap *game_map, double delta_time, struct Wall *walls, struct Pacman *pacman)
 {
     if (ghost->isActive)
+    {
         if (sqrt(pow(ghost->x_block_cordinates - pacman->x_block_cordinates, 2) + pow(ghost->y_block_cordinates - pacman->y_block_cordinates, 2)) > 8)
         {
             ghostMove(ghost, game_map, delta_time, walls, pacman->x_block_cordinates, pacman->y_block_cordinates);
@@ -215,10 +222,5 @@ void mooveOrangeGhost(struct Ghost *ghost, struct GameMap *game_map, double delt
         {
             ghostMove(ghost, game_map, delta_time, walls, 0, game_map->block_height);
         }
-}
-
-void ghostRelease(struct Ghost *ghost)
-{
-    ghost->x = 13 * BLOCK_SIZE;
-    ghost->y = 14 * BLOCK_SIZE;
+    }
 }
