@@ -88,7 +88,7 @@ struct Wall *readMapFromFile(char *fileName, struct GameMap *game_map, SDL_Rende
             {
                 c = fgetc(file);
             }
-            if (c >= 'a' && c <= 'x')
+            if (c >= 'a' && c <= 'y')
             {
                 char path[18] = {'.', '/', 't', 'i', 'l', 'e', 's', '/', 'M', 'a', 'p', '/', c, '.', 'p', 'n', 'g', '\0'};
 
@@ -101,7 +101,7 @@ struct Wall *readMapFromFile(char *fileName, struct GameMap *game_map, SDL_Rende
                 map[i * (game_map->block_width) + j].type = c;
                 map[i * (game_map->block_width) + j].texture = loadImage(renderer, path);
             }
-            if (c == 'y')
+            if (c == 'z')
             {
                 game_map->point_amount++;
                 map[i * (game_map->block_width) + j].hitBox.w = BLOCK_SIZE / 2;                                         // decrease size 2 times

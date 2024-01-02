@@ -61,13 +61,13 @@ void renderMap(SDL_Renderer *renderer, struct Wall *map, int rows, int cols)
     {
         for (int j = 0; j < cols; j++)
         {
-            if (map[i * cols + j].type >= 'a' && map[i * cols + j].type <= 'x')
+            if (map[i * cols + j].type >= 'a' && map[i * cols + j].type <= 'y')
             {
                 renderImage(renderer, map[i * cols + j].texture, map[i * cols + j].hitBox.x, map[i * cols + j].hitBox.y, BLOCK_SIZE, BLOCK_SIZE, 0);
                 // SDL_SetRenderDrawColor(renderer, 0, 120, 255, 255); // block color
                 // SDL_RenderFillRect(renderer, &map[i * cols + j].hitBox);
             }
-            if (map[i * cols + j].type == 'y' && map[i * cols + j].show)
+            if (map[i * cols + j].type == 'z' && map[i * cols + j].show)
             {
 
                 SDL_SetRenderDrawColor(renderer, 241, 188, 179, 255);

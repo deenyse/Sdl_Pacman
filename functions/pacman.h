@@ -16,7 +16,7 @@ bool isAbleToGo(struct Wall *map, struct GameMap *game_map, int to_x, int to_y)
 {
     if (to_x < -1 || to_x > game_map->block_width)
         return true;
-    if (map[to_y * game_map->block_width + to_x].type >= 'a' && map[to_y * game_map->block_width + to_x].type <= 'x')
+    if (map[to_y * game_map->block_width + to_x].type >= 'a' && map[to_y * game_map->block_width + to_x].type <= 'y')
         return false;
     return true;
 }
@@ -39,28 +39,28 @@ void pacmanMoove(struct Pacman *pacman, double delta_time, struct GameMap *map, 
     {
         if (pacman->x_speed > 0) // checks if pacman is in a wall // add general if x y is not out of border
         {
-            if ((walls[pacman->y_block_cordinates * map->block_width + pacman->x_block_cordinates + 1].hitBox.x <= pacman->x + BLOCK_SIZE) && walls[pacman->y_block_cordinates * map->block_width + pacman->x_block_cordinates + 1].type >= 'a' && walls[pacman->y_block_cordinates * map->block_width + pacman->x_block_cordinates + 1].type <= 'x')
+            if ((walls[pacman->y_block_cordinates * map->block_width + pacman->x_block_cordinates + 1].hitBox.x <= pacman->x + BLOCK_SIZE) && walls[pacman->y_block_cordinates * map->block_width + pacman->x_block_cordinates + 1].type >= 'a' && walls[pacman->y_block_cordinates * map->block_width + pacman->x_block_cordinates + 1].type <= 'y')
             {
                 pacman->x = walls[pacman->y_block_cordinates * map->block_width + pacman->x_block_cordinates + 1].hitBox.x - BLOCK_SIZE;
             }
         }
         else if (pacman->x_speed < 0)
         {
-            if ((walls[pacman->y_block_cordinates * map->block_width + pacman->x_block_cordinates - 1].hitBox.x >= pacman->x - BLOCK_SIZE) && walls[pacman->y_block_cordinates * map->block_width + pacman->x_block_cordinates - 1].type >= 'a' && walls[pacman->y_block_cordinates * map->block_width + pacman->x_block_cordinates - 1].type <= 'x')
+            if ((walls[pacman->y_block_cordinates * map->block_width + pacman->x_block_cordinates - 1].hitBox.x >= pacman->x - BLOCK_SIZE) && walls[pacman->y_block_cordinates * map->block_width + pacman->x_block_cordinates - 1].type >= 'a' && walls[pacman->y_block_cordinates * map->block_width + pacman->x_block_cordinates - 1].type <= 'y')
             {
                 pacman->x = walls[pacman->y_block_cordinates * map->block_width + pacman->x_block_cordinates - 1].hitBox.x + BLOCK_SIZE;
             }
         }
         else if (pacman->y_speed > 0)
         {
-            if ((walls[(pacman->y_block_cordinates + 1) * map->block_width + pacman->x_block_cordinates].hitBox.y <= pacman->y + BLOCK_SIZE) && walls[(pacman->y_block_cordinates + 1) * map->block_width + pacman->x_block_cordinates].type >= 'a' && walls[(pacman->y_block_cordinates + 1) * map->block_width + pacman->x_block_cordinates].type <= 'x')
+            if ((walls[(pacman->y_block_cordinates + 1) * map->block_width + pacman->x_block_cordinates].hitBox.y <= pacman->y + BLOCK_SIZE) && walls[(pacman->y_block_cordinates + 1) * map->block_width + pacman->x_block_cordinates].type >= 'a' && walls[(pacman->y_block_cordinates + 1) * map->block_width + pacman->x_block_cordinates].type <= 'y')
             {
                 pacman->y = walls[(pacman->y_block_cordinates + 1) * map->block_width + pacman->x_block_cordinates].hitBox.y - BLOCK_SIZE;
             }
         }
         else if (pacman->y_speed < 0)
         {
-            if ((walls[(pacman->y_block_cordinates - 1) * map->block_width + pacman->x_block_cordinates].hitBox.y >= pacman->y - BLOCK_SIZE) && walls[(pacman->y_block_cordinates - 1) * map->block_width + pacman->x_block_cordinates].type >= 'a' && walls[(pacman->y_block_cordinates - 1) * map->block_width + pacman->x_block_cordinates].type <= 'x')
+            if ((walls[(pacman->y_block_cordinates - 1) * map->block_width + pacman->x_block_cordinates].hitBox.y >= pacman->y - BLOCK_SIZE) && walls[(pacman->y_block_cordinates - 1) * map->block_width + pacman->x_block_cordinates].type >= 'a' && walls[(pacman->y_block_cordinates - 1) * map->block_width + pacman->x_block_cordinates].type <= 'y')
             {
                 pacman->y = walls[(pacman->y_block_cordinates - 1) * map->block_width + pacman->x_block_cordinates].hitBox.y + BLOCK_SIZE;
             }
