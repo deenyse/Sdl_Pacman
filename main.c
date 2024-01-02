@@ -1,8 +1,8 @@
-#include "functions/game.h"
 #include "functions/graphiks.h"
 #include "functions/pacman.h"
 #include "functions/init.h"
 #include "functions/ghost.h"
+#include "functions/game.h"
 
 int main()
 {
@@ -14,13 +14,6 @@ int main()
     struct Pacman pacman = {.lives = 4};
     struct Wall *map = NULL;
 
-    initRedGhost(&redGhost);
-    initPinkGhost(&pinkGhost);
-    initBlueGhost(&blueGhost);
-    initOrangeGhost(&orangeGhost);
-    ghostRelease(0, &redGhost);
-    redGhost.isActive = false;
-
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
 
@@ -28,6 +21,13 @@ int main()
 
     ImageInit(&pacman, &map, renderer, &game_map);
     char **top_positions = readIntegersFromFile("results.txt");
+
+    initRedGhost(&redGhost, renderer);
+    initPinkGhost(&pinkGhost, renderer);
+    initBlueGhost(&blueGhost, renderer);
+    initOrangeGhost(&orangeGhost, renderer);
+    ghostRelease(0, &redGhost);
+    redGhost.isActive = false;
 
     int game_state = 0;
     bool running = true;
@@ -141,14 +141,14 @@ int main()
             moovePinkGhost(&pinkGhost, &game_map, delta_time, map, &pacman);
             mooveBlueGhost(&blueGhost, &game_map, delta_time, map, &pacman, &redGhost);
             mooveOrangeGhost(&orangeGhost, &game_map, delta_time, map, &pacman);
-            intersectionMechanik(&pacman, &redGhost, &pinkGhost, &blueGhost, &orangeGhost, &game_map, game_state);
+            intersectionMechanik(&pacman, &redGhost, &pinkGhost, &blueGhost, &orangeGhost, &game_map, game_state, renderer);
 
             mapUxDraw(renderer, map, &pacman, &game_map, top_positions);
             draw_pacman(renderer, &pacman);
-            drawGhost(renderer, &redGhost);
-            drawGhost(renderer, &pinkGhost);
-            drawGhost(renderer, &blueGhost);
-            drawGhost(renderer, &orangeGhost);
+            drawGhost(renderer, &redGhost, &pacman);
+            drawGhost(renderer, &pinkGhost, &pacman);
+            drawGhost(renderer, &blueGhost, &pacman);
+            drawGhost(renderer, &orangeGhost, &pacman);
         }
         else if (game_state == 5)
         {

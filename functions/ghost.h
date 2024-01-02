@@ -4,7 +4,19 @@
 #include "init.h"
 #include "pacman.h"
 
-void initRedGhost(struct Ghost *ghost)
+SDL_Texture *loadImage2(SDL_Renderer *renderer, const char *imagePath)
+{
+    // Load the image from the specified path using SDL_image
+    SDL_Surface *surface = IMG_Load(imagePath);
+    // Create a texture from the loaded surface
+    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    // Free the surface, as it's no longer needed
+    SDL_FreeSurface(surface);
+
+    return texture;
+}
+
+void initRedGhost(struct Ghost *ghost, struct SDL_Renderer *renderer)
 {
     ghost->x_block_cordinates = 12;
     ghost->y_block_cordinates = 14;
@@ -15,16 +27,12 @@ void initRedGhost(struct Ghost *ghost)
     ghost->x_speed = ghost->moovement_speed;
     ghost->y_speed = 0;
 
-    ghost->animation_frame = 0;
-    ghost->tiles[0] = NULL;
-    ghost->tiles[1] = NULL;
-    ghost->tiles[2] = NULL;
-    ghost->tiles[3] = NULL;
-
+    ghost->tile = loadImage2(renderer, "tiles/Ghost/r.png");
+    ghost->scaredTile = loadImage2(renderer, "tiles/Ghost/s.png");
     ghost->character = 'r';
     ghost->isActive = false;
 }
-void initPinkGhost(struct Ghost *ghost)
+void initPinkGhost(struct Ghost *ghost, struct SDL_Renderer *renderer)
 {
     ghost->x_block_cordinates = 13;
     ghost->y_block_cordinates = 14;
@@ -35,16 +43,13 @@ void initPinkGhost(struct Ghost *ghost)
     ghost->x_speed = ghost->moovement_speed;
     ghost->y_speed = 0;
 
-    ghost->animation_frame = 0;
-    ghost->tiles[0] = NULL;
-    ghost->tiles[1] = NULL;
-    ghost->tiles[2] = NULL;
-    ghost->tiles[3] = NULL;
+    ghost->tile = loadImage2(renderer, "tiles/Ghost/p.png");
+    ghost->scaredTile = loadImage2(renderer, "tiles/Ghost/s.png");
 
     ghost->character = 'p';
     ghost->isActive = false;
 }
-void initBlueGhost(struct Ghost *ghost)
+void initBlueGhost(struct Ghost *ghost, struct SDL_Renderer *renderer)
 {
     ghost->x_block_cordinates = 14;
     ghost->y_block_cordinates = 14;
@@ -55,16 +60,13 @@ void initBlueGhost(struct Ghost *ghost)
     ghost->x_speed = ghost->moovement_speed;
     ghost->y_speed = 0;
 
-    ghost->animation_frame = 0;
-    ghost->tiles[0] = NULL;
-    ghost->tiles[1] = NULL;
-    ghost->tiles[2] = NULL;
-    ghost->tiles[3] = NULL;
+    ghost->tile = loadImage2(renderer, "tiles/Ghost/b.png");
+    ghost->scaredTile = loadImage2(renderer, "tiles/Ghost/s.png");
 
     ghost->character = 'b';
     ghost->isActive = false;
 }
-void initOrangeGhost(struct Ghost *ghost)
+void initOrangeGhost(struct Ghost *ghost, struct SDL_Renderer *renderer)
 {
     ghost->x_block_cordinates = 15;
     ghost->y_block_cordinates = 14;
@@ -75,11 +77,8 @@ void initOrangeGhost(struct Ghost *ghost)
     ghost->x_speed = ghost->moovement_speed;
     ghost->y_speed = 0;
 
-    ghost->animation_frame = 0;
-    ghost->tiles[0] = NULL;
-    ghost->tiles[1] = NULL;
-    ghost->tiles[2] = NULL;
-    ghost->tiles[3] = NULL;
+    ghost->tile = loadImage2(renderer, "tiles/Ghost/o.png");
+    ghost->scaredTile = loadImage2(renderer, "tiles/Ghost/s.png");
 
     ghost->character = 'o';
     ghost->isActive = false;

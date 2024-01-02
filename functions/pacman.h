@@ -12,7 +12,7 @@ void initializePacman(struct Pacman *pacman)
     pacman->x_speed = 0;
     pacman->y_speed = 0;
     pacman->moovement_speed = MOVEMENT_SPEED;
-    pacman->animation_frame = 3;
+    pacman->animation_frame = 0;
     pacman->isKilling = false;
     pacman->timer_amount = 0;
 }

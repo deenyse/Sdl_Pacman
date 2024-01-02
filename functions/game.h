@@ -220,32 +220,32 @@ bool creatureIntersection(struct Pacman *pacman, struct Ghost *ghost)
     return (pacman->x_block_cordinates == ghost->x_block_cordinates && pacman->y_block_cordinates == ghost->y_block_cordinates);
 }
 
-void intersectionMechanik(struct Pacman *pacman, struct Ghost *redGhost, struct Ghost *pinkGhost, struct Ghost *blueGhost, struct Ghost *orangeGhost, struct GameMap *game_map, int game_state)
+void intersectionMechanik(struct Pacman *pacman, struct Ghost *redGhost, struct Ghost *pinkGhost, struct Ghost *blueGhost, struct Ghost *orangeGhost, struct GameMap *game_map, int game_state, struct SDL_Renderer *renderer)
 {
     if (pacman->isKilling)
     {
         if (creatureIntersection(pacman, redGhost))
         {
             game_map->score += 200;
-            initRedGhost(redGhost);
+            initRedGhost(redGhost, renderer);
             SDL_AddTimer(2000, ghostRelease, redGhost);
         }
         else if (creatureIntersection(pacman, pinkGhost))
         {
             game_map->score += 200;
-            initPinkGhost(pinkGhost);
+            initPinkGhost(pinkGhost, renderer);
             SDL_AddTimer(2000, ghostRelease, pinkGhost);
         }
         else if (creatureIntersection(pacman, blueGhost))
         {
             game_map->score += 200;
-            initBlueGhost(blueGhost);
+            initBlueGhost(blueGhost, renderer);
             SDL_AddTimer(2000, ghostRelease, blueGhost);
         }
         else if (creatureIntersection(pacman, orangeGhost))
         {
             game_map->score += 200;
-            initOrangeGhost(orangeGhost);
+            initOrangeGhost(orangeGhost, renderer);
             SDL_AddTimer(2000, ghostRelease, orangeGhost);
         }
     }

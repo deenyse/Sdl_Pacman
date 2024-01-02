@@ -73,8 +73,8 @@ struct Ghost
     double y_speed;
     double moovement_speed;
 
-    double animation_frame;
-    SDL_Texture *tiles[4];
+    SDL_Texture *tile;
+    SDL_Texture *scaredTile;
 
     char character;
     bool isActive;
