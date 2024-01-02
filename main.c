@@ -17,9 +17,6 @@ struct Ghost
     double animation_frame;
     SDL_Texture *tiles[4];
 
-    int x_target;
-    int y_target;
-
     char character;
 } Ghost;
 
@@ -80,6 +77,26 @@ void initBlueGhost(struct Ghost *ghost)
 
     ghost->character = 'b';
 }
+void initOrangeGhost(struct Ghost *ghost)
+{
+    ghost->x_block_cordinates = 18;
+    ghost->y_block_cordinates = 17;
+    ghost->x = ghost->x_block_cordinates * BLOCK_SIZE;
+    ghost->y = ghost->y_block_cordinates * BLOCK_SIZE;
+
+    ghost->moovement_speed = MOVEMENT_SPEED * 0.75;
+    ghost->x_speed = ghost->moovement_speed;
+    ghost->y_speed = 0;
+
+    ghost->animation_frame = 0;
+    ghost->tiles[0] = NULL;
+    ghost->tiles[1] = NULL;
+    ghost->tiles[2] = NULL;
+    ghost->tiles[3] = NULL;
+
+    ghost->character = 'o';
+}
+
 void drawGhost(struct SDL_Renderer *renderer, struct Ghost *ghost, struct GameMap *game_map)
 {
 
@@ -233,7 +250,17 @@ void mooveBlueGhost(struct Ghost *ghost, struct GameMap *game_map, double delta_
         ghostMove(ghost, game_map, delta_time, walls, 2 * (pacman->x_block_cordinates + 2) - red_ghost->x_block_cordinates, 2 * (pacman->y_block_cordinates) - red_ghost->y_block_cordinates);
     }
 }
-
+void mooveOrangeGhost(struct Ghost *ghost, struct GameMap *game_map, double delta_time, struct Wall *walls, struct Pacman *pacman)
+{
+    if (sqrt(pow(ghost->x_block_cordinates - pacman->x_block_cordinates, 2) + pow(ghost->y_block_cordinates - pacman->y_block_cordinates, 2)) > 8)
+    {
+        ghostMove(ghost, game_map, delta_time, walls, pacman->x_block_cordinates, pacman->y_block_cordinates);
+    }
+    else
+    {
+        ghostMove(ghost, game_map, delta_time, walls, 0, game_map->block_height);
+    }
+}
 int main()
 {
     struct Ghost redGhost;
@@ -247,6 +274,7 @@ int main()
     initRedGhost(&redGhost);
     initPinkGhost(&pinkGhost);
     initBlueGhost(&blueGhost);
+    initOrangeGhost(&orangeGhost);
 
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
@@ -356,7 +384,10 @@ int main()
 
         // draw wals, pacman, score, bg
         mapUxDraw(renderer, map, &pacman, &game_map);
-
+        drawGhost(renderer, &redGhost, &game_map);
+        drawGhost(renderer, &pinkGhost, &game_map);
+        drawGhost(renderer, &blueGhost, &game_map);
+        drawGhost(renderer, &orangeGhost, &game_map);
         // checking points
         if (game_map.collected_point_amount < game_map.point_amount)
         {
@@ -367,23 +398,16 @@ int main()
             //  check and collect intersected points
             point_collector(&pacman, &game_map, map);
 
-            // red
-            drawGhost(renderer, &redGhost, &game_map);
             mooveRedGhost(&redGhost, &game_map, delta_time, map, &pacman);
-
-            // pink
-            drawGhost(renderer, &pinkGhost, &game_map);
             moovePinkGhost(&pinkGhost, &game_map, delta_time, map, &pacman);
-
-            // blue
-            drawGhost(renderer, &blueGhost, &game_map);
             mooveBlueGhost(&blueGhost, &game_map, delta_time, map, &pacman, &redGhost);
+            mooveOrangeGhost(&orangeGhost, &game_map, delta_time, map, &pacman);
         }
         else
         {
             printf("You won\n");
         }
-        //////////////////////////
+
         // update renderer
         SDL_RenderPresent(renderer);
     }
