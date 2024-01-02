@@ -1,10 +1,13 @@
-#SDL_Pacman
+# SDL_Pacman
+
 Recreated pacman game by using C and SDL librurary
 
-#Installation
+## Installation
+
 Make sure that you have properly installed SDL2
 
-#Compile and run
+## Compile and run
+
 Run the following command to compile main
 
 ```bash
