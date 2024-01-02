@@ -78,5 +78,6 @@ struct Ghost
 
     char character;
     bool isActive;
+
 } Ghost;
 #endif

@@ -133,7 +133,7 @@ int main()
     struct Ghost blueGhost;
     struct Ghost orangeGhost;
     struct GameMap game_map;
-    struct Pacman pacman = {.lives = 3};
+    struct Pacman pacman = {.lives = 4};
     struct Wall *map = NULL;
 
     initRedGhost(&redGhost);
