@@ -25,3 +25,9 @@ Run the following command to delete result of compilation
 ```bash
 make clean
 ```
+
+## Gaming
+
+You can moove pacman by pressing and holding keyboard arrows.
+On start of the game press any arrow, and game will immidiatly begin.
+You able to play untill you see viktory, or loose screen
