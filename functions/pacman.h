@@ -127,6 +127,11 @@ void pacman_animate(struct Pacman *pacman, double delta_time)
 
 void draw_pacman(SDL_Renderer *renderer, struct Pacman *pacman)
 {
+    // // draw pacman position map(greeen)
+    // SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+    // SDL_Rect pacman_box1 = {.x = pacman->x_block_cordinates * BLOCK_SIZE, .y = pacman->y_block_cordinates * BLOCK_SIZE + game_map->top_margin, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
+    // SDL_RenderFillRect(renderer, &pacman_box1);
+
     // draw pacman
     if (pacman->x_speed > 0)
         renderImage(renderer, pacman->tiles[(int)pacman->animation_frame], pacman->x, pacman->y, BLOCK_SIZE, BLOCK_SIZE, 180);

@@ -10,7 +10,7 @@
 #include <SDL2/SDL_ttf.h>
 
 #define BLOCK_SIZE 24
-#define MOVEMENT_SPEED 0.24 // 0.24
+#define MOVEMENT_SPEED 0.22 // 0.24
 
 struct Pacman
 {

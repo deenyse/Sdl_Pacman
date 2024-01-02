@@ -114,16 +114,6 @@ void mapUxDraw(SDL_Renderer *renderer, struct Wall *map, struct Pacman *pacman, 
     // draw mapux
     renderMap(renderer, map, game_map->block_height, game_map->block_width);
 
-    // draw pacman position map(greeen)
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    SDL_Rect pacman_box1 = {.x = pacman->x_block_cordinates * BLOCK_SIZE, .y = pacman->y_block_cordinates * BLOCK_SIZE + game_map->top_margin, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
-    SDL_RenderFillRect(renderer, &pacman_box1);
-
-    // draw pacman image hitbox
-    // SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
-    //  SDL_Rect pacman_box = {.x = pacman->x, .y = pacman->y, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
-    //  SDL_RenderFillRect(renderer, &pacman_box);
-
     // print score
     char *currentScore = intToStringWithScore(game_map->score);
     char highScoreString[strlen("High score:") + strlen(top_positions[0]) + 1];
@@ -141,9 +131,9 @@ void mapUxDraw(SDL_Renderer *renderer, struct Wall *map, struct Pacman *pacman, 
 void drawGhost(struct SDL_Renderer *renderer, struct Ghost *ghost, struct GameMap *game_map)
 {
     // draw ghost position map(greeen)
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    SDL_Rect ghost_box1 = {.x = ghost->x_block_cordinates * BLOCK_SIZE, .y = ghost->y_block_cordinates * BLOCK_SIZE + game_map->top_margin, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
-    SDL_RenderFillRect(renderer, &ghost_box1);
+    // SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+    // SDL_Rect ghost_box1 = {.x = ghost->x_block_cordinates * BLOCK_SIZE, .y = ghost->y_block_cordinates * BLOCK_SIZE + game_map->top_margin, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
+    // SDL_RenderFillRect(renderer, &ghost_box1);
     if (ghost->character == 'r')
     {
         // draw ghost image hitbox

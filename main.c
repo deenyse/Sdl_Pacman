@@ -3,6 +3,7 @@
 #include "functions/pacman.h"
 #include "functions/init.h"
 #include "functions/ghost.h"
+
 char **readIntegersFromFile(const char *filePath)
 {
     FILE *file = fopen(filePath, "r");
@@ -68,7 +69,7 @@ bool creatureIntersection(struct Pacman *pacman, struct Ghost *ghost)
     return (pacman->x_block_cordinates == ghost->x_block_cordinates && pacman->y_block_cordinates == ghost->y_block_cordinates);
 }
 
-void intersectionMechanik(struct Pacman *pacman, struct Ghost *redGhost, struct Ghost *pinkGhost, struct Ghost *blueGhost, struct Ghost *orangeGhost, struct GameMap *game_map)
+void intersectionMechanik(struct Pacman *pacman, struct Ghost *redGhost, struct Ghost *pinkGhost, struct Ghost *blueGhost, struct Ghost *orangeGhost, struct GameMap *game_map, int game_state)
 {
     if (pacman->isKilling)
     {
@@ -99,6 +100,30 @@ void intersectionMechanik(struct Pacman *pacman, struct Ghost *redGhost, struct 
     }
     else
     {
+        if (creatureIntersection(pacman, redGhost) || creatureIntersection(pacman, pinkGhost) || creatureIntersection(pacman, blueGhost) || creatureIntersection(pacman, orangeGhost))
+        {
+            pacman->lives--;
+            pacman->x = 14 * BLOCK_SIZE - BLOCK_SIZE / 2;
+            pacman->y = 20 * BLOCK_SIZE;
+            pacman->x_speed = 0;
+            pacman->y_speed = 0;
+            if (game_state >= 1)
+            {
+                ghostRelease(0, redGhost);
+            }
+            if (game_state >= 2)
+            {
+                ghostRelease(0, pinkGhost);
+            }
+            if (game_state >= 3)
+            {
+                ghostRelease(0, blueGhost);
+            }
+            if (game_state >= 4)
+            {
+                ghostRelease(0, orangeGhost);
+            }
+        }
     }
 }
 int main()
@@ -133,8 +158,7 @@ int main()
     Uint64 delta_now = SDL_GetPerformanceCounter();
     Uint64 delta_last = 0;
     double delta_time = 0;
-    //
-    // keys
+
     bool key_up_pressed = false;
     bool key_down_pressed = false;
     bool key_left_pressed = false;
@@ -221,67 +245,66 @@ int main()
             pacman.y_speed = 0;
         }
 
-        // Delta time
         delta_last = delta_now;
         delta_now = SDL_GetPerformanceCounter();
         delta_time = (double)((delta_now - delta_last) * 1000 / (double)SDL_GetPerformanceFrequency());
 
-        if (game_map.collected_point_amount < game_map.point_amount)
+        if (game_state == 0)
         {
-            if (game_state == 0)
-            {
-                drawStartMenu(renderer, top_positions);
-                draw_pacman(renderer, &pacman);
-            }
-            else if (game_state >= 1)
-            {
-                pacmanMoove(&pacman, delta_time, &game_map, map);
-                pacman_animate(&pacman, delta_time);
-                point_collector(&pacman, &game_map, map);
-                mooveRedGhost(&redGhost, &game_map, delta_time, map, &pacman);
-                moovePinkGhost(&pinkGhost, &game_map, delta_time, map, &pacman);
-                mooveBlueGhost(&blueGhost, &game_map, delta_time, map, &pacman, &redGhost);
-                mooveOrangeGhost(&orangeGhost, &game_map, delta_time, map, &pacman);
-                intersectionMechanik(&pacman, &redGhost, &pinkGhost, &blueGhost, &orangeGhost, &game_map);
-
-                mapUxDraw(renderer, map, &pacman, &game_map, top_positions);
-                draw_pacman(renderer, &pacman);
-                drawGhost(renderer, &redGhost, &game_map);
-                drawGhost(renderer, &pinkGhost, &game_map);
-                drawGhost(renderer, &blueGhost, &game_map);
-                drawGhost(renderer, &orangeGhost, &game_map);
-            }
-            if (game_state == 0 && (key_left_pressed + key_right_pressed + key_up_pressed + key_down_pressed) > 0)
-            {
-                game_state = 1;
-                redGhost.isActive = true;
-            }
-            if (game_map.collected_point_amount == (int)(game_map.point_amount * 0.2))
-            {
-                game_state = 2;
-                ghostRelease(0, &pinkGhost);
-            }
-            if (game_map.collected_point_amount == (int)(game_map.point_amount * 0.4))
-            {
-                game_state = 3;
-                ghostRelease(0, &blueGhost);
-            }
-
-            if (game_map.collected_point_amount == (int)(game_map.point_amount * 0.6))
-            {
-                game_state = 4;
-                ghostRelease(0, &orangeGhost);
-            }
+            drawStartMenu(renderer, top_positions);
+            draw_pacman(renderer, &pacman);
         }
-        else
+        else if (game_state >= 1)
+        {
+            pacmanMoove(&pacman, delta_time, &game_map, map);
+            pacman_animate(&pacman, delta_time);
+            point_collector(&pacman, &game_map, map);
+            mooveRedGhost(&redGhost, &game_map, delta_time, map, &pacman);
+            moovePinkGhost(&pinkGhost, &game_map, delta_time, map, &pacman);
+            mooveBlueGhost(&blueGhost, &game_map, delta_time, map, &pacman, &redGhost);
+            mooveOrangeGhost(&orangeGhost, &game_map, delta_time, map, &pacman);
+            intersectionMechanik(&pacman, &redGhost, &pinkGhost, &blueGhost, &orangeGhost, &game_map, game_state);
+
+            mapUxDraw(renderer, map, &pacman, &game_map, top_positions);
+            draw_pacman(renderer, &pacman);
+            drawGhost(renderer, &redGhost, &game_map);
+            drawGhost(renderer, &pinkGhost, &game_map);
+            drawGhost(renderer, &blueGhost, &game_map);
+            drawGhost(renderer, &orangeGhost, &game_map);
+        }
+        if (game_state == 0 && (key_left_pressed + key_right_pressed + key_up_pressed + key_down_pressed) > 0)
+        {
+            game_state = 1;
+            redGhost.isActive = true;
+        }
+        if (game_map.collected_point_amount == (int)(game_map.point_amount * 0.2))
+        {
+            game_state = 2;
+            ghostRelease(0, &pinkGhost);
+        }
+        if (game_map.collected_point_amount == (int)(game_map.point_amount * 0.4))
+        {
+            game_state = 3;
+            ghostRelease(0, &blueGhost);
+        }
+
+        if (game_map.collected_point_amount == (int)(game_map.point_amount * 0.6))
+        {
+            game_state = 4;
+            ghostRelease(0, &orangeGhost);
+        }
+        if (game_map.collected_point_amount < game_map.point_amount)
         {
             printf("You won\n");
         }
-        // update renderer
+        else if (pacman.lives == 0)
+        {
+            printf("you lose\n");
+        }
+
         SDL_RenderPresent(renderer);
     }
-    ////////......./////////////////////
-    // Uvolnění prostředků
+
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
