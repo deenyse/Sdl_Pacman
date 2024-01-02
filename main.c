@@ -18,7 +18,7 @@ int main()
     initPinkGhost(&pinkGhost);
     initBlueGhost(&blueGhost);
     initOrangeGhost(&orangeGhost);
-    ///////////....///
+
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
 
@@ -135,30 +135,31 @@ int main()
             drawGhost(renderer, &blueGhost, &game_map);
             drawGhost(renderer, &orangeGhost, &game_map);
 
-            if (game_state == 0 && (key_left_pressed + key_right_pressed + key_up_pressed + key_down_pressed) > 0)
-                game_state = 1;
             if (game_state >= 1)
             {
                 pacmanMoove(&pacman, delta_time, &game_map, map);
                 pacman_animate(&pacman, delta_time);
                 point_collector(&pacman, &game_map, map);
                 mooveRedGhost(&redGhost, &game_map, delta_time, map, &pacman);
-            }
-            if (game_state >= 2)
                 moovePinkGhost(&pinkGhost, &game_map, delta_time, map, &pacman);
-            if (game_state >= 3)
                 mooveBlueGhost(&blueGhost, &game_map, delta_time, map, &pacman, &redGhost);
-            if (game_state >= 4)
                 mooveOrangeGhost(&orangeGhost, &game_map, delta_time, map, &pacman);
-
+            }
+            if (game_state == 0 && (key_left_pressed + key_right_pressed + key_up_pressed + key_down_pressed) > 0)
+            {
+                game_state = 1;
+                redGhost.isActive = true;
+            }
             if (game_map.collected_point_amount == (int)(game_map.point_amount * 0.2))
             {
                 game_state = 2;
+                pinkGhost.isActive = true;
                 ghostRelease(&pinkGhost);
             }
             if (game_map.collected_point_amount == (int)(game_map.point_amount * 0.4))
             {
                 game_state = 3;
+                blueGhost.isActive = true;
                 ghostRelease(&blueGhost);
             }
 
@@ -166,6 +167,7 @@ int main()
             {
 
                 game_state = 4;
+                orangeGhost.isActive = true;
                 ghostRelease(&orangeGhost);
             }
         }
@@ -176,7 +178,7 @@ int main()
         // update renderer
         SDL_RenderPresent(renderer);
     }
-    //
+    ////////.......///////////////
     // Uvolnění prostředků
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

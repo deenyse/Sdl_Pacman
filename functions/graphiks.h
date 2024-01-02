@@ -67,10 +67,15 @@ void renderMap(SDL_Renderer *renderer, struct Wall *map, int rows, int cols)
                 // SDL_SetRenderDrawColor(renderer, 0, 120, 255, 255); // block color
                 // SDL_RenderFillRect(renderer, &map[i * cols + j].hitBox);
             }
-            if (map[i * cols + j].type == 'z' && map[i * cols + j].show)
+            else if (map[i * cols + j].type == 'z' && map[i * cols + j].show)
             {
 
                 SDL_SetRenderDrawColor(renderer, 241, 188, 179, 255);
+                SDL_RenderFillRect(renderer, &map[i * cols + j].hitBox);
+            }
+            else if (map[i * cols + j].type == 'Z' && map[i * cols + j].show)
+            {
+                SDL_SetRenderDrawColor(renderer, 62, 180, 137, 255);
                 SDL_RenderFillRect(renderer, &map[i * cols + j].hitBox);
             }
         }

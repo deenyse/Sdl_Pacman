@@ -102,13 +102,25 @@ struct Wall *readMapFromFile(char *fileName, struct GameMap *game_map, SDL_Rende
                 map[i * (game_map->block_width) + j].type = c;
                 map[i * (game_map->block_width) + j].texture = loadImage(renderer, path);
             }
-            if (c == 'z')
+            else if (c == 'z')
             {
                 game_map->point_amount++;
-                map[i * (game_map->block_width) + j].hitBox.w = BLOCK_SIZE / 2;                                         // decrease size 2 times
-                map[i * (game_map->block_width) + j].hitBox.h = BLOCK_SIZE / 2;                                         // decrease size 2 times
-                map[i * (game_map->block_width) + j].hitBox.x = j * BLOCK_SIZE + BLOCK_SIZE / 4;                        // - decreased size divided by 2
-                map[i * (game_map->block_width) + j].hitBox.y = i * BLOCK_SIZE + game_map->top_margin + BLOCK_SIZE / 4; // - decreased size divided by 2
+                map[i * (game_map->block_width) + j].hitBox.w = BLOCK_SIZE / 3;
+                map[i * (game_map->block_width) + j].hitBox.h = BLOCK_SIZE / 3;
+                map[i * (game_map->block_width) + j].hitBox.x = j * BLOCK_SIZE + BLOCK_SIZE / 3;
+                map[i * (game_map->block_width) + j].hitBox.y = i * BLOCK_SIZE + game_map->top_margin + BLOCK_SIZE / 3;
+                map[i * (game_map->block_width) + j].x_block_coordinates = j;
+                map[i * (game_map->block_width) + j].y_block_coordinates = i;
+                map[i * (game_map->block_width) + j].type = c;
+                map[i * (game_map->block_width) + j].show = true;
+            }
+            else if (c == 'Z')
+            {
+                game_map->point_amount++;
+                map[i * (game_map->block_width) + j].hitBox.w = BLOCK_SIZE / 2;
+                map[i * (game_map->block_width) + j].hitBox.h = BLOCK_SIZE / 2;
+                map[i * (game_map->block_width) + j].hitBox.x = j * BLOCK_SIZE + BLOCK_SIZE / 4;
+                map[i * (game_map->block_width) + j].hitBox.y = i * BLOCK_SIZE + game_map->top_margin + BLOCK_SIZE / 4;
                 map[i * (game_map->block_width) + j].x_block_coordinates = j;
                 map[i * (game_map->block_width) + j].y_block_coordinates = i;
                 map[i * (game_map->block_width) + j].type = c;

@@ -27,6 +27,7 @@ struct Pacman
     SDL_Texture *tiles[4];
 
     int lives;
+    bool isKilling;
 
 } Pacman;
 struct Wall
@@ -75,5 +76,6 @@ struct Ghost
     SDL_Texture *tiles[4];
 
     char character;
+    bool isActive;
 } Ghost;
 #endif
