@@ -128,7 +128,7 @@ void mapUxDraw(SDL_Renderer *renderer, struct Wall *map, struct Pacman *pacman, 
     drawPacmanLives(renderer, pacman);
 }
 
-void drawGhost(struct SDL_Renderer *renderer, struct Ghost *ghost, struct GameMap *game_map)
+void drawGhost(struct SDL_Renderer *renderer, struct Ghost *ghost)
 {
     // draw ghost position map(greeen)
     // SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);

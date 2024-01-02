@@ -89,7 +89,8 @@ Uint32 timerCallback(Uint32 interval, void *param)
     }
 
     pacman->timer_amount--;
-    return 0;
+    interval = 0;
+    return interval;
 }
 
 void point_collector(struct Pacman *pacman, struct GameMap *map, struct Wall *walls)

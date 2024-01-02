@@ -46,12 +46,8 @@ char **readIntegersFromFile(const char *filePath)
 void insertNumber(char **array, int size, int num, const char *filename)
 {
     int i;
-
-    // Convert the integer to string
     char numStr[10];
-    sprintf(numStr, "%d", num);
-
-    // Find the correct position to insert the number
+    snprintf(numStr, sizeof(numStr), "%d", num);
     for (i = 0; i < size; i++)
     {
         if (atoi(array[i]) < num)
@@ -59,27 +55,20 @@ void insertNumber(char **array, int size, int num, const char *filename)
             break;
         }
     }
-
-    // Open the file for writing
     FILE *file = fopen(filename, "w");
     if (file == NULL)
     {
         perror("Error opening file");
         exit(EXIT_FAILURE);
     }
-
-    // Write the modified array to the file
     for (int j = 0; j < size; j++)
     {
         if (j == i)
         {
-            // Insert the new number at the correct position
             fprintf(file, "%s\n", numStr);
         }
         fprintf(file, "%s\n", array[j]);
     }
-
-    // Close the file
     fclose(file);
 }
 
@@ -95,14 +84,26 @@ void drawStartMenu(struct SDL_Renderer *renderer, char **top_positions)
     printText(renderer, "press any arrow to start", 5, 800, 40);
 }
 
-void drawVictoryScreen(struct SDL_Renderer *renderer, char **top_positions) {}
+void drawVictoryScreen(struct SDL_Renderer *renderer)
+{
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    printText(renderer, "You Win", 260, 200, 60);
+}
+void drawLooseScreen(struct SDL_Renderer *renderer)
+{
+    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+    SDL_RenderClear(renderer);
+    printText(renderer, "You Loose", 260, 200, 60);
+}
 Uint32 ghostRelease(Uint32 interval, void *param)
 {
     struct Ghost *ghost = (struct Ghost *)param;
     ghost->x = 13 * BLOCK_SIZE;
     ghost->y = 14 * BLOCK_SIZE;
     ghost->isActive = true;
-    return 0;
+    interval = 0;
+    return interval;
 }
 
 bool creatureIntersection(struct Pacman *pacman, struct Ghost *ghost)
@@ -308,20 +309,20 @@ int main()
 
             mapUxDraw(renderer, map, &pacman, &game_map, top_positions);
             draw_pacman(renderer, &pacman);
-            drawGhost(renderer, &redGhost, &game_map);
-            drawGhost(renderer, &pinkGhost, &game_map);
-            drawGhost(renderer, &blueGhost, &game_map);
-            drawGhost(renderer, &orangeGhost, &game_map);
+            drawGhost(renderer, &redGhost);
+            drawGhost(renderer, &pinkGhost);
+            drawGhost(renderer, &blueGhost);
+            drawGhost(renderer, &orangeGhost);
         }
         else if (game_state == 5)
         {
-            drawVictoryScreen(renderer, top_positions);
+            drawVictoryScreen(renderer);
         }
         else if (game_state == 6)
         {
-            printf("you loose");
-            // drawGameOverScreen(renderer, top_positions);
+            drawLooseScreen(renderer);
         }
+
         if (game_state == 0 && (key_left_pressed + key_right_pressed + key_up_pressed + key_down_pressed) > 0)
         {
             game_state = 1;
