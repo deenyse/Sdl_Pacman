@@ -22,8 +22,8 @@ struct Ghost
 
     char character;
 } Ghost;
-//
-void initGhost(struct Ghost *ghost, struct GameMap *game_map)
+
+void initRedGhost(struct Ghost *ghost, struct GameMap *game_map)
 {
     ghost->x_block_cordinates = 18;
     ghost->y_block_cordinates = 17;
@@ -42,13 +42,41 @@ void initGhost(struct Ghost *ghost, struct GameMap *game_map)
 
     ghost->character = 'r';
 }
+void initPinkGhost(struct Ghost *ghost, struct GameMap *game_map)
+{
+    ghost->x_block_cordinates = 18;
+    ghost->y_block_cordinates = 17;
+    ghost->x = ghost->x_block_cordinates * BLOCK_SIZE;
+    ghost->y = ghost->y_block_cordinates * BLOCK_SIZE;
+
+    ghost->moovement_speed = MOVEMENT_SPEED * 0.75;
+    ghost->x_speed = ghost->moovement_speed;
+    ghost->y_speed = 0;
+
+    ghost->animation_frame = 0;
+    ghost->tiles[0] = NULL;
+    ghost->tiles[1] = NULL;
+    ghost->tiles[2] = NULL;
+    ghost->tiles[3] = NULL;
+
+    ghost->character = 'p';
+}
 void drawGhost(struct SDL_Renderer *renderer, struct Ghost *ghost, struct GameMap *game_map)
 {
-    // draw ghost image hitbox
-    SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-    SDL_Rect ghost_box = {.x = ghost->x, .y = ghost->y, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
-    SDL_RenderFillRect(renderer, &ghost_box);
 
+    if (ghost->character == 'r')
+    {
+        // draw ghost image hitbox
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_Rect ghost_box = {.x = ghost->x, .y = ghost->y, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
+        SDL_RenderFillRect(renderer, &ghost_box);
+    }
+    else if (ghost->character == 'p')
+    {
+        SDL_SetRenderDrawColor(renderer, 255, 192, 203, 255);
+        SDL_Rect ghost_box = {.x = ghost->x, .y = ghost->y, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
+        SDL_RenderFillRect(renderer, &ghost_box);
+    }
     // draw ghost position map(greeen)
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
     SDL_Rect ghost_box1 = {.x = ghost->x_block_cordinates * BLOCK_SIZE, .y = ghost->y_block_cordinates * BLOCK_SIZE + game_map->top_margin, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
@@ -131,14 +159,40 @@ void ghostMove(struct Ghost *ghost, struct GameMap *game_map, double delta_time,
     ghost->x_block_cordinates = round((ghost->x / BLOCK_SIZE));
     ghost->y_block_cordinates = round((ghost->y - game_map->top_margin) / BLOCK_SIZE);
 }
+
+void mooveRedGhost(struct Ghost *ghost, struct GameMap *game_map, double delta_time, struct Wall *walls, struct Pacman *pacman)
+{
+    ghostMove(ghost, game_map, delta_time, walls, pacman->x_block_cordinates, pacman->y_block_cordinates);
+}
+void moovePinkGhost(struct Ghost *ghost, struct GameMap *game_map, double delta_time, struct Wall *walls, struct Pacman *pacman)
+{
+    if (pacman->y_speed < 0)
+    {
+        ghostMove(ghost, game_map, delta_time, walls, pacman->x_block_cordinates - 4, pacman->y_block_cordinates - 4);
+    }
+    else if (pacman->y_speed > 0)
+    {
+        ghostMove(ghost, game_map, delta_time, walls, pacman->x_block_cordinates, pacman->y_block_cordinates + 4);
+    }
+    else if (pacman->x_speed < 0)
+    {
+        ghostMove(ghost, game_map, delta_time, walls, pacman->x_block_cordinates - 4, pacman->y_block_cordinates);
+    }
+    else if (pacman->x_speed > 0)
+    {
+        ghostMove(ghost, game_map, delta_time, walls, pacman->x_block_cordinates + 4, pacman->y_block_cordinates);
+    }
+}
 int main()
 {
     struct Ghost redGhost;
+    struct Ghost pinkGhost;
     struct GameMap game_map;
     struct Pacman pacman = {.lives = 4};
     struct Wall *map = NULL;
 
-    initGhost(&redGhost, &game_map);
+    initRedGhost(&redGhost, &game_map);
+    initPinkGhost(&pinkGhost, &game_map);
 
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
@@ -249,8 +303,6 @@ int main()
         // draw wals, pacman, score, bg
         mapUxDraw(renderer, map, &pacman, &game_map);
 
-        // ghosts
-        drawGhost(renderer, &redGhost, &game_map);
         // checking points
         if (game_map.collected_point_amount < game_map.point_amount)
         {
@@ -261,7 +313,13 @@ int main()
             //  check and collect intersected points
             point_collector(&pacman, &game_map, map);
 
-            ghostMove(&redGhost, &game_map, delta_time, map, pacman.x_block_cordinates, pacman.y_block_cordinates);
+            // red
+            drawGhost(renderer, &redGhost, &game_map);
+            mooveRedGhost(&redGhost, &game_map, delta_time, map, &pacman);
+
+            // pink
+            drawGhost(renderer, &pinkGhost, &game_map);
+            moovePinkGhost(&pinkGhost, &game_map, delta_time, map, &pacman);
         }
         else
         {
