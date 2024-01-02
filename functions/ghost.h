@@ -208,3 +208,9 @@ void mooveOrangeGhost(struct Ghost *ghost, struct GameMap *game_map, double delt
         ghostMove(ghost, game_map, delta_time, walls, 0, game_map->block_height);
     }
 }
+
+void ghostRelease(struct Ghost *ghost)
+{
+    ghost->x = 13 * BLOCK_SIZE;
+    ghost->y = 14 * BLOCK_SIZE;
+}

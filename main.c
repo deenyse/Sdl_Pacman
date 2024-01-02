@@ -154,11 +154,20 @@ int main()
             if (game_map.collected_point_amount == (int)(game_map.point_amount * 0.2))
             {
                 game_state = 2;
+                ghostRelease(&pinkGhost);
             }
             if (game_map.collected_point_amount == (int)(game_map.point_amount * 0.4))
+            {
                 game_state = 3;
+                ghostRelease(&blueGhost);
+            }
+
             if (game_map.collected_point_amount == (int)(game_map.point_amount * 0.6))
+            {
+
                 game_state = 4;
+                ghostRelease(&orangeGhost);
+            }
         }
         else
         {
