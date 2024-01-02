@@ -10,6 +10,7 @@ void WindowGameInit(struct GameMap *game_map, struct Pacman *pacman, SDL_Window 
     game_map->block_height = 31;
     game_map->pixel_height = BLOCK_SIZE * game_map->block_height;
     game_map->pixel_width = BLOCK_SIZE * game_map->block_width;
+
     game_map->top_margin = BLOCK_SIZE * 3;
     game_map->bottom_margin = BLOCK_SIZE * 2;
     game_map->point_amount = 0;

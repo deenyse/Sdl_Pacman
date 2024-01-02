@@ -96,9 +96,9 @@ void mapUxDraw(SDL_Renderer *renderer, struct Wall *map, struct Pacman *pacman, 
     renderMap(renderer, map, game_map->block_height, game_map->block_width);
 
     // draw pacman position map(greeen)
-    // SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    // SDL_Rect pacman_box1 = {.x = pacman->x_block_cordinates * BLOCK_SIZE, .y = pacman->y_block_cordinates * BLOCK_SIZE + game_map->top_margin, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
-    // SDL_RenderFillRect(renderer, &pacman_box1);
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+    SDL_Rect pacman_box1 = {.x = pacman->x_block_cordinates * BLOCK_SIZE, .y = pacman->y_block_cordinates * BLOCK_SIZE + game_map->top_margin, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
+    SDL_RenderFillRect(renderer, &pacman_box1);
 
     // draw pacman image hitbox
     // SDL_SetRenderDrawColor(renderer, 255, 255, 0, 255);
@@ -122,4 +122,36 @@ void mapUxDraw(SDL_Renderer *renderer, struct Wall *map, struct Pacman *pacman, 
     drawPacmanLives(renderer, pacman);
 }
 
+void drawGhost(struct SDL_Renderer *renderer, struct Ghost *ghost, struct GameMap *game_map)
+{
+    // draw ghost position map(greeen)
+    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
+    SDL_Rect ghost_box1 = {.x = ghost->x_block_cordinates * BLOCK_SIZE, .y = ghost->y_block_cordinates * BLOCK_SIZE + game_map->top_margin, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
+    SDL_RenderFillRect(renderer, &ghost_box1);
+    if (ghost->character == 'r')
+    {
+        // draw ghost image hitbox
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_Rect ghost_box = {.x = ghost->x, .y = ghost->y, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
+        SDL_RenderFillRect(renderer, &ghost_box);
+    }
+    else if (ghost->character == 'p')
+    {
+        SDL_SetRenderDrawColor(renderer, 255, 192, 203, 255);
+        SDL_Rect ghost_box = {.x = ghost->x, .y = ghost->y, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
+        SDL_RenderFillRect(renderer, &ghost_box);
+    }
+    else if (ghost->character == 'b')
+    {
+        SDL_SetRenderDrawColor(renderer, 135, 206, 250, 255);
+        SDL_Rect ghost_box = {.x = ghost->x, .y = ghost->y, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
+        SDL_RenderFillRect(renderer, &ghost_box);
+    }
+    else if (ghost->character == 'o')
+    {
+        SDL_SetRenderDrawColor(renderer, 255, 165, 0, 255);
+        SDL_Rect ghost_box = {.x = ghost->x, .y = ghost->y, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
+        SDL_RenderFillRect(renderer, &ghost_box);
+    }
+}
 #endif

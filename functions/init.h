@@ -51,10 +51,29 @@ struct GameMap
     int block_height;
     int pixel_height;
     int pixel_width;
+
+    int top_pixel_margin;
     int top_margin;
     int bottom_margin;
+
     int point_amount;
     int collected_point_amount;
-} GameMap;
 
+} GameMap;
+struct Ghost
+{
+    double x;
+    double y;
+    int x_block_cordinates;
+    int y_block_cordinates;
+
+    double x_speed;
+    double y_speed;
+    double moovement_speed;
+
+    double animation_frame;
+    SDL_Texture *tiles[4];
+
+    char character;
+} Ghost;
 #endif

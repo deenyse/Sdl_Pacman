@@ -2,265 +2,8 @@
 #include "functions/graphiks.h"
 #include "functions/pacman.h"
 #include "functions/init.h"
+#include "functions/ghost.h"
 
-struct Ghost
-{
-    double x;
-    double y;
-    int x_block_cordinates;
-    int y_block_cordinates;
-
-    double x_speed;
-    double y_speed;
-    double moovement_speed;
-
-    double animation_frame;
-    SDL_Texture *tiles[4];
-
-    char character;
-} Ghost;
-
-void initRedGhost(struct Ghost *ghost)
-{
-    ghost->x_block_cordinates = 18;
-    ghost->y_block_cordinates = 17;
-    ghost->x = ghost->x_block_cordinates * BLOCK_SIZE;
-    ghost->y = ghost->y_block_cordinates * BLOCK_SIZE;
-
-    ghost->moovement_speed = MOVEMENT_SPEED * 0.75;
-    ghost->x_speed = ghost->moovement_speed;
-    ghost->y_speed = 0;
-
-    ghost->animation_frame = 0;
-    ghost->tiles[0] = NULL;
-    ghost->tiles[1] = NULL;
-    ghost->tiles[2] = NULL;
-    ghost->tiles[3] = NULL;
-
-    ghost->character = 'r';
-}
-void initPinkGhost(struct Ghost *ghost)
-{
-    ghost->x_block_cordinates = 18;
-    ghost->y_block_cordinates = 17;
-    ghost->x = ghost->x_block_cordinates * BLOCK_SIZE;
-    ghost->y = ghost->y_block_cordinates * BLOCK_SIZE;
-
-    ghost->moovement_speed = MOVEMENT_SPEED * 0.75;
-    ghost->x_speed = ghost->moovement_speed;
-    ghost->y_speed = 0;
-
-    ghost->animation_frame = 0;
-    ghost->tiles[0] = NULL;
-    ghost->tiles[1] = NULL;
-    ghost->tiles[2] = NULL;
-    ghost->tiles[3] = NULL;
-
-    ghost->character = 'p';
-}
-void initBlueGhost(struct Ghost *ghost)
-{
-    ghost->x_block_cordinates = 18;
-    ghost->y_block_cordinates = 17;
-    ghost->x = ghost->x_block_cordinates * BLOCK_SIZE;
-    ghost->y = ghost->y_block_cordinates * BLOCK_SIZE;
-
-    ghost->moovement_speed = MOVEMENT_SPEED * 0.75;
-    ghost->x_speed = ghost->moovement_speed;
-    ghost->y_speed = 0;
-
-    ghost->animation_frame = 0;
-    ghost->tiles[0] = NULL;
-    ghost->tiles[1] = NULL;
-    ghost->tiles[2] = NULL;
-    ghost->tiles[3] = NULL;
-
-    ghost->character = 'b';
-}
-void initOrangeGhost(struct Ghost *ghost)
-{
-    ghost->x_block_cordinates = 18;
-    ghost->y_block_cordinates = 17;
-    ghost->x = ghost->x_block_cordinates * BLOCK_SIZE;
-    ghost->y = ghost->y_block_cordinates * BLOCK_SIZE;
-
-    ghost->moovement_speed = MOVEMENT_SPEED * 0.75;
-    ghost->x_speed = ghost->moovement_speed;
-    ghost->y_speed = 0;
-
-    ghost->animation_frame = 0;
-    ghost->tiles[0] = NULL;
-    ghost->tiles[1] = NULL;
-    ghost->tiles[2] = NULL;
-    ghost->tiles[3] = NULL;
-
-    ghost->character = 'o';
-}
-
-void drawGhost(struct SDL_Renderer *renderer, struct Ghost *ghost, struct GameMap *game_map)
-{
-
-    if (ghost->character == 'r')
-    {
-        // draw ghost image hitbox
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        SDL_Rect ghost_box = {.x = ghost->x, .y = ghost->y, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
-        SDL_RenderFillRect(renderer, &ghost_box);
-    }
-    else if (ghost->character == 'p')
-    {
-        SDL_SetRenderDrawColor(renderer, 255, 192, 203, 255);
-        SDL_Rect ghost_box = {.x = ghost->x, .y = ghost->y, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
-        SDL_RenderFillRect(renderer, &ghost_box);
-    }
-    else if (ghost->character == 'b')
-    {
-        SDL_SetRenderDrawColor(renderer, 135, 206, 250, 255);
-        SDL_Rect ghost_box = {.x = ghost->x, .y = ghost->y, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
-        SDL_RenderFillRect(renderer, &ghost_box);
-    }
-    else if (ghost->character == 'o')
-    {
-        SDL_SetRenderDrawColor(renderer, 255, 165, 0, 255);
-        SDL_Rect ghost_box = {.x = ghost->x, .y = ghost->y, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
-        SDL_RenderFillRect(renderer, &ghost_box);
-    }
-    // draw ghost position map(greeen)
-    SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255);
-    SDL_Rect ghost_box1 = {.x = ghost->x_block_cordinates * BLOCK_SIZE, .y = ghost->y_block_cordinates * BLOCK_SIZE + game_map->top_margin, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
-    SDL_RenderFillRect(renderer, &ghost_box1);
-}
-
-void ghostMove(struct Ghost *ghost, struct GameMap *game_map, double delta_time, struct Wall *walls, int to_x, int to_y)
-{
-    double top_distance = sqrt(pow(ghost->x_block_cordinates - to_x, 2) + pow(ghost->y_block_cordinates - 1 - to_y, 2));
-    double bottom_distance = sqrt(pow(ghost->x_block_cordinates - to_x, 2) + pow(ghost->y_block_cordinates + 1 - to_y, 2));
-    double right_distance = sqrt(pow(ghost->x_block_cordinates + 1 - to_x, 2) + pow(ghost->y_block_cordinates - to_y, 2));
-    double left_distance = sqrt(pow(ghost->x_block_cordinates - 1 - to_x, 2) + pow(ghost->y_block_cordinates - to_y, 2));
-    bool able_top = isAbleToGo(walls, game_map, ghost->x_block_cordinates, ghost->y_block_cordinates - 1) && !(ghost->y_speed > 0);
-    bool able_bottom = isAbleToGo(walls, game_map, ghost->x_block_cordinates, ghost->y_block_cordinates + 1) && !(ghost->y_speed < 0);
-    bool able_right = isAbleToGo(walls, game_map, ghost->x_block_cordinates + 1, ghost->y_block_cordinates) && !(ghost->x_speed < 0);
-    bool able_left = isAbleToGo(walls, game_map, ghost->x_block_cordinates - 1, ghost->y_block_cordinates) && !(ghost->x_speed > 0);
-
-    // if (((top_distance <= bottom_distance) * able_bottom) && ((top_distance <= right_distance) * able_right) && ((top_distance <= left_distance) * able_left) && able_top)
-
-    if (able_top && ((top_distance <= bottom_distance) || !able_bottom) && ((top_distance <= left_distance) || !able_left) && ((top_distance <= right_distance) || !able_right))
-    {
-        ghost->x_speed = 0;
-        ghost->y_speed = -ghost->moovement_speed;
-    }
-    else if (able_bottom && ((bottom_distance <= top_distance) || !able_top) && ((bottom_distance <= left_distance) || !able_left) && ((bottom_distance <= right_distance) || !able_right))
-    {
-        ghost->x_speed = 0;
-        ghost->y_speed = ghost->moovement_speed;
-    }
-    else if (able_right && ((right_distance <= bottom_distance) || !able_bottom) && ((right_distance <= left_distance) || !able_left) && ((right_distance <= top_distance) || !able_top))
-    {
-        ghost->x_speed = ghost->moovement_speed;
-        ghost->y_speed = 0;
-    }
-    else if (able_left && ((left_distance <= bottom_distance) || !able_bottom) && ((left_distance <= right_distance) || !able_right) && ((left_distance <= top_distance) || !able_top))
-    {
-        ghost->x_speed = -ghost->moovement_speed;
-        ghost->y_speed = 0;
-    }
-
-    ghost->x = round(ghost->x + ghost->x_speed * delta_time);
-    ghost->y = round(ghost->y + ghost->y_speed * delta_time);
-
-    if (ghost->x < 0)
-        ghost->x = game_map->pixel_width - BLOCK_SIZE;
-    else if (ghost->x + BLOCK_SIZE > game_map->pixel_width)
-        ghost->x = 0;
-    else if (ghost->x_block_cordinates > 0 && ghost->x_block_cordinates < game_map->block_width - 1 && ghost->y_block_cordinates >= 0 && ghost->y_block_cordinates < game_map->block_height)
-    {
-        if (ghost->x_speed > 0) // checks if ghost is in a wall // add general if x y is not out of border
-        {
-            if ((walls[ghost->y_block_cordinates * game_map->block_width + ghost->x_block_cordinates + 1].hitBox.x <= ghost->x + BLOCK_SIZE) && walls[ghost->y_block_cordinates * game_map->block_width + ghost->x_block_cordinates + 1].type >= 'a' && walls[ghost->y_block_cordinates * game_map->block_width + ghost->x_block_cordinates + 1].type <= 'y')
-            {
-                ghost->x = walls[ghost->y_block_cordinates * game_map->block_width + ghost->x_block_cordinates + 1].hitBox.x - BLOCK_SIZE;
-            }
-        }
-        else if (ghost->x_speed < 0)
-        {
-            if ((walls[ghost->y_block_cordinates * game_map->block_width + ghost->x_block_cordinates - 1].hitBox.x >= ghost->x - BLOCK_SIZE) && walls[ghost->y_block_cordinates * game_map->block_width + ghost->x_block_cordinates - 1].type >= 'a' && walls[ghost->y_block_cordinates * game_map->block_width + ghost->x_block_cordinates - 1].type <= 'y')
-            {
-                ghost->x = walls[ghost->y_block_cordinates * game_map->block_width + ghost->x_block_cordinates - 1].hitBox.x + BLOCK_SIZE;
-            }
-        }
-        else if (ghost->y_speed > 0)
-        {
-            if ((walls[(ghost->y_block_cordinates + 1) * game_map->block_width + ghost->x_block_cordinates].hitBox.y <= ghost->y + BLOCK_SIZE) && walls[(ghost->y_block_cordinates + 1) * game_map->block_width + ghost->x_block_cordinates].type >= 'a' && walls[(ghost->y_block_cordinates + 1) * game_map->block_width + ghost->x_block_cordinates].type <= 'y')
-            {
-                ghost->y = walls[(ghost->y_block_cordinates + 1) * game_map->block_width + ghost->x_block_cordinates].hitBox.y - BLOCK_SIZE;
-            }
-        }
-        else if (ghost->y_speed < 0)
-        {
-            if ((walls[(ghost->y_block_cordinates - 1) * game_map->block_width + ghost->x_block_cordinates].hitBox.y >= ghost->y - BLOCK_SIZE) && walls[(ghost->y_block_cordinates - 1) * game_map->block_width + ghost->x_block_cordinates].type >= 'a' && walls[(ghost->y_block_cordinates - 1) * game_map->block_width + ghost->x_block_cordinates].type <= 'y')
-            {
-                ghost->y = walls[(ghost->y_block_cordinates - 1) * game_map->block_width + ghost->x_block_cordinates].hitBox.y + BLOCK_SIZE;
-            }
-        }
-    }
-
-    ghost->x_block_cordinates = round((ghost->x / BLOCK_SIZE));
-    ghost->y_block_cordinates = round((ghost->y - game_map->top_margin) / BLOCK_SIZE);
-}
-
-void mooveRedGhost(struct Ghost *ghost, struct GameMap *game_map, double delta_time, struct Wall *walls, struct Pacman *pacman)
-{
-    ghostMove(ghost, game_map, delta_time, walls, pacman->x_block_cordinates, pacman->y_block_cordinates);
-}
-void moovePinkGhost(struct Ghost *ghost, struct GameMap *game_map, double delta_time, struct Wall *walls, struct Pacman *pacman)
-{
-    if (pacman->y_speed < 0)
-    {
-        ghostMove(ghost, game_map, delta_time, walls, pacman->x_block_cordinates - 4, pacman->y_block_cordinates - 4);
-    }
-    else if (pacman->y_speed > 0)
-    {
-        ghostMove(ghost, game_map, delta_time, walls, pacman->x_block_cordinates, pacman->y_block_cordinates + 4);
-    }
-    else if (pacman->x_speed < 0)
-    {
-        ghostMove(ghost, game_map, delta_time, walls, pacman->x_block_cordinates - 4, pacman->y_block_cordinates);
-    }
-    else if (pacman->x_speed > 0)
-    {
-        ghostMove(ghost, game_map, delta_time, walls, pacman->x_block_cordinates + 4, pacman->y_block_cordinates);
-    }
-}
-void mooveBlueGhost(struct Ghost *ghost, struct GameMap *game_map, double delta_time, struct Wall *walls, struct Pacman *pacman, struct Ghost *red_ghost)
-{
-    if (pacman->y_speed < 0)
-    {
-        ghostMove(ghost, game_map, delta_time, walls, 2 * (pacman->x_block_cordinates - 2) - red_ghost->x_block_cordinates, 2 * (pacman->y_block_cordinates - 2) - red_ghost->y_block_cordinates);
-    }
-    else if (pacman->y_speed > 0)
-    {
-        ghostMove(ghost, game_map, delta_time, walls, 2 * (pacman->x_block_cordinates) - red_ghost->x_block_cordinates, 2 * (pacman->y_block_cordinates + 2) - red_ghost->y_block_cordinates);
-    }
-    else if (pacman->x_speed < 0)
-    {
-        ghostMove(ghost, game_map, delta_time, walls, 2 * (pacman->x_block_cordinates - 2) - red_ghost->x_block_cordinates, 2 * (pacman->y_block_cordinates) - red_ghost->y_block_cordinates);
-    }
-    else if (pacman->x_speed > 0)
-    {
-        ghostMove(ghost, game_map, delta_time, walls, 2 * (pacman->x_block_cordinates + 2) - red_ghost->x_block_cordinates, 2 * (pacman->y_block_cordinates) - red_ghost->y_block_cordinates);
-    }
-}
-void mooveOrangeGhost(struct Ghost *ghost, struct GameMap *game_map, double delta_time, struct Wall *walls, struct Pacman *pacman)
-{
-    if (sqrt(pow(ghost->x_block_cordinates - pacman->x_block_cordinates, 2) + pow(ghost->y_block_cordinates - pacman->y_block_cordinates, 2)) > 8)
-    {
-        ghostMove(ghost, game_map, delta_time, walls, pacman->x_block_cordinates, pacman->y_block_cordinates);
-    }
-    else
-    {
-        ghostMove(ghost, game_map, delta_time, walls, 0, game_map->block_height);
-    }
-}
 int main()
 {
     struct Ghost redGhost;
@@ -275,7 +18,7 @@ int main()
     initPinkGhost(&pinkGhost);
     initBlueGhost(&blueGhost);
     initOrangeGhost(&orangeGhost);
-
+    ///////////....///
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
 
@@ -283,6 +26,7 @@ int main()
 
     ImageInit(&pacman, &map, renderer, &game_map);
 
+    int game_state = 0;
     bool running = true;
     SDL_Event event = {};
 
@@ -295,7 +39,7 @@ int main()
     bool key_down_pressed = false;
     bool key_left_pressed = false;
     bool key_right_pressed = false;
-
+    //.
     while (running)
     {
         while (SDL_PollEvent(&event))
@@ -382,36 +126,48 @@ int main()
         delta_now = SDL_GetPerformanceCounter();
         delta_time = (double)((delta_now - delta_last) * 1000 / (double)SDL_GetPerformanceFrequency());
 
-        // draw wals, pacman, score, bg
-        mapUxDraw(renderer, map, &pacman, &game_map);
-        drawGhost(renderer, &redGhost, &game_map);
-        drawGhost(renderer, &pinkGhost, &game_map);
-        drawGhost(renderer, &blueGhost, &game_map);
-        drawGhost(renderer, &orangeGhost, &game_map);
-        // checking points
         if (game_map.collected_point_amount < game_map.point_amount)
         {
-            // moove pacman hitbox
-            pacmanMoove(&pacman, delta_time, &game_map, map);
-            // pacman animate
-            pacman_animate(&pacman, delta_time);
-            //  check and collect intersected points
-            point_collector(&pacman, &game_map, map);
 
-            mooveRedGhost(&redGhost, &game_map, delta_time, map, &pacman);
-            moovePinkGhost(&pinkGhost, &game_map, delta_time, map, &pacman);
-            mooveBlueGhost(&blueGhost, &game_map, delta_time, map, &pacman, &redGhost);
-            mooveOrangeGhost(&orangeGhost, &game_map, delta_time, map, &pacman);
+            mapUxDraw(renderer, map, &pacman, &game_map);
+            drawGhost(renderer, &redGhost, &game_map);
+            drawGhost(renderer, &pinkGhost, &game_map);
+            drawGhost(renderer, &blueGhost, &game_map);
+            drawGhost(renderer, &orangeGhost, &game_map);
+
+            if (game_state == 0 && (key_left_pressed + key_right_pressed + key_up_pressed + key_down_pressed) > 0)
+                game_state = 1;
+            if (game_state >= 1)
+            {
+                pacmanMoove(&pacman, delta_time, &game_map, map);
+                pacman_animate(&pacman, delta_time);
+                point_collector(&pacman, &game_map, map);
+                mooveRedGhost(&redGhost, &game_map, delta_time, map, &pacman);
+            }
+            if (game_state >= 2)
+                moovePinkGhost(&pinkGhost, &game_map, delta_time, map, &pacman);
+            if (game_state >= 3)
+                mooveBlueGhost(&blueGhost, &game_map, delta_time, map, &pacman, &redGhost);
+            if (game_state >= 4)
+                mooveOrangeGhost(&orangeGhost, &game_map, delta_time, map, &pacman);
+
+            if (game_map.collected_point_amount == (int)(game_map.point_amount * 0.2))
+            {
+                game_state = 2;
+            }
+            if (game_map.collected_point_amount == (int)(game_map.point_amount * 0.4))
+                game_state = 3;
+            if (game_map.collected_point_amount == (int)(game_map.point_amount * 0.6))
+                game_state = 4;
         }
         else
         {
             printf("You won\n");
         }
-
         // update renderer
         SDL_RenderPresent(renderer);
     }
-
+    //
     // Uvolnění prostředků
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);

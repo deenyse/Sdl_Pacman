@@ -4,8 +4,10 @@
 #include "init.h"
 void initializePacman(struct Pacman *pacman, struct GameMap *game_map)
 {
-    pacman->x = 12 * BLOCK_SIZE - BLOCK_SIZE / 2 + game_map->bottom_margin;
-    pacman->y = 20 * BLOCK_SIZE;
+    pacman->x_block_cordinates = 14;
+    pacman->y_block_cordinates = 17;
+    pacman->x = pacman->x_block_cordinates * BLOCK_SIZE - BLOCK_SIZE / 2;
+    pacman->y = (pacman->y_block_cordinates + 3) * BLOCK_SIZE;
     pacman->x_speed = 0;
     pacman->y_speed = 0;
     pacman->moovement_speed = MOVEMENT_SPEED;
