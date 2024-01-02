@@ -23,7 +23,7 @@ struct Ghost
     char character;
 } Ghost;
 
-void initRedGhost(struct Ghost *ghost, struct GameMap *game_map)
+void initRedGhost(struct Ghost *ghost)
 {
     ghost->x_block_cordinates = 18;
     ghost->y_block_cordinates = 17;
@@ -42,7 +42,7 @@ void initRedGhost(struct Ghost *ghost, struct GameMap *game_map)
 
     ghost->character = 'r';
 }
-void initPinkGhost(struct Ghost *ghost, struct GameMap *game_map)
+void initPinkGhost(struct Ghost *ghost)
 {
     ghost->x_block_cordinates = 18;
     ghost->y_block_cordinates = 17;
@@ -61,6 +61,25 @@ void initPinkGhost(struct Ghost *ghost, struct GameMap *game_map)
 
     ghost->character = 'p';
 }
+void initBlueGhost(struct Ghost *ghost)
+{
+    ghost->x_block_cordinates = 18;
+    ghost->y_block_cordinates = 17;
+    ghost->x = ghost->x_block_cordinates * BLOCK_SIZE;
+    ghost->y = ghost->y_block_cordinates * BLOCK_SIZE;
+
+    ghost->moovement_speed = MOVEMENT_SPEED * 0.75;
+    ghost->x_speed = ghost->moovement_speed;
+    ghost->y_speed = 0;
+
+    ghost->animation_frame = 0;
+    ghost->tiles[0] = NULL;
+    ghost->tiles[1] = NULL;
+    ghost->tiles[2] = NULL;
+    ghost->tiles[3] = NULL;
+
+    ghost->character = 'b';
+}
 void drawGhost(struct SDL_Renderer *renderer, struct Ghost *ghost, struct GameMap *game_map)
 {
 
@@ -74,6 +93,18 @@ void drawGhost(struct SDL_Renderer *renderer, struct Ghost *ghost, struct GameMa
     else if (ghost->character == 'p')
     {
         SDL_SetRenderDrawColor(renderer, 255, 192, 203, 255);
+        SDL_Rect ghost_box = {.x = ghost->x, .y = ghost->y, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
+        SDL_RenderFillRect(renderer, &ghost_box);
+    }
+    else if (ghost->character == 'b')
+    {
+        SDL_SetRenderDrawColor(renderer, 135, 206, 250, 255);
+        SDL_Rect ghost_box = {.x = ghost->x, .y = ghost->y, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
+        SDL_RenderFillRect(renderer, &ghost_box);
+    }
+    else if (ghost->character == 'o')
+    {
+        SDL_SetRenderDrawColor(renderer, 255, 165, 0, 255);
         SDL_Rect ghost_box = {.x = ghost->x, .y = ghost->y, .w = BLOCK_SIZE, .h = BLOCK_SIZE};
         SDL_RenderFillRect(renderer, &ghost_box);
     }
@@ -120,11 +151,11 @@ void ghostMove(struct Ghost *ghost, struct GameMap *game_map, double delta_time,
     ghost->x = round(ghost->x + ghost->x_speed * delta_time);
     ghost->y = round(ghost->y + ghost->y_speed * delta_time);
 
-    if (ghost->x_block_cordinates < -1)
-        ghost->x = game_map->pixel_width;
-    else if (ghost->x_block_cordinates > game_map->block_width)
-        ghost->x = -1 * BLOCK_SIZE;
-    else if (ghost->x_block_cordinates >= 0 && ghost->x_block_cordinates < game_map->block_width && ghost->y_block_cordinates >= 0 && ghost->y_block_cordinates < game_map->block_height)
+    if (ghost->x < 0)
+        ghost->x = game_map->pixel_width - BLOCK_SIZE;
+    else if (ghost->x + BLOCK_SIZE > game_map->pixel_width)
+        ghost->x = 0;
+    else if (ghost->x_block_cordinates > 0 && ghost->x_block_cordinates < game_map->block_width - 1 && ghost->y_block_cordinates >= 0 && ghost->y_block_cordinates < game_map->block_height)
     {
         if (ghost->x_speed > 0) // checks if ghost is in a wall // add general if x y is not out of border
         {
@@ -183,16 +214,39 @@ void moovePinkGhost(struct Ghost *ghost, struct GameMap *game_map, double delta_
         ghostMove(ghost, game_map, delta_time, walls, pacman->x_block_cordinates + 4, pacman->y_block_cordinates);
     }
 }
+void mooveBlueGhost(struct Ghost *ghost, struct GameMap *game_map, double delta_time, struct Wall *walls, struct Pacman *pacman, struct Ghost *red_ghost)
+{
+    if (pacman->y_speed < 0)
+    {
+        ghostMove(ghost, game_map, delta_time, walls, 2 * (pacman->x_block_cordinates - 2) - red_ghost->x_block_cordinates, 2 * (pacman->y_block_cordinates - 2) - red_ghost->y_block_cordinates);
+    }
+    else if (pacman->y_speed > 0)
+    {
+        ghostMove(ghost, game_map, delta_time, walls, 2 * (pacman->x_block_cordinates) - red_ghost->x_block_cordinates, 2 * (pacman->y_block_cordinates + 2) - red_ghost->y_block_cordinates);
+    }
+    else if (pacman->x_speed < 0)
+    {
+        ghostMove(ghost, game_map, delta_time, walls, 2 * (pacman->x_block_cordinates - 2) - red_ghost->x_block_cordinates, 2 * (pacman->y_block_cordinates) - red_ghost->y_block_cordinates);
+    }
+    else if (pacman->x_speed > 0)
+    {
+        ghostMove(ghost, game_map, delta_time, walls, 2 * (pacman->x_block_cordinates + 2) - red_ghost->x_block_cordinates, 2 * (pacman->y_block_cordinates) - red_ghost->y_block_cordinates);
+    }
+}
+
 int main()
 {
     struct Ghost redGhost;
     struct Ghost pinkGhost;
+    struct Ghost blueGhost;
+    struct Ghost orangeGhost;
     struct GameMap game_map;
     struct Pacman pacman = {.lives = 4};
     struct Wall *map = NULL;
 
-    initRedGhost(&redGhost, &game_map);
-    initPinkGhost(&pinkGhost, &game_map);
+    initRedGhost(&redGhost);
+    initPinkGhost(&pinkGhost);
+    initBlueGhost(&blueGhost);
 
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
@@ -320,12 +374,16 @@ int main()
             // pink
             drawGhost(renderer, &pinkGhost, &game_map);
             moovePinkGhost(&pinkGhost, &game_map, delta_time, map, &pacman);
+
+            // blue
+            drawGhost(renderer, &blueGhost, &game_map);
+            mooveBlueGhost(&blueGhost, &game_map, delta_time, map, &pacman, &redGhost);
         }
         else
         {
             printf("You won\n");
         }
-
+        //////////////////////////
         // update renderer
         SDL_RenderPresent(renderer);
     }

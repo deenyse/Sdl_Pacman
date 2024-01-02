@@ -14,10 +14,11 @@ void initializePacman(struct Pacman *pacman, struct GameMap *game_map)
 
 bool isAbleToGo(struct Wall *map, struct GameMap *game_map, int to_x, int to_y)
 {
-    if (to_x < -1 || to_x > game_map->block_width)
+    if (to_x < 0 || to_x >= game_map->block_width)
         return true;
     if (map[to_y * game_map->block_width + to_x].type >= 'a' && map[to_y * game_map->block_width + to_x].type <= 'y')
         return false;
+
     return true;
 }
 
@@ -27,15 +28,14 @@ void pacmanMoove(struct Pacman *pacman, double delta_time, struct GameMap *map, 
     pacman->x = round(pacman->x + pacman->x_speed * delta_time);
     pacman->y = round(pacman->y + pacman->y_speed * delta_time);
 
-    // pacman->isMooving = true; // for animation
-
     // over border check
-    if (pacman->x_block_cordinates < -1)
-        pacman->x = map->pixel_width;
-    else if (pacman->x_block_cordinates > map->block_width)
-        pacman->x = -1 * BLOCK_SIZE;
+    if (pacman->x < 0)
+        pacman->x = map->pixel_width - BLOCK_SIZE;
+    else if (pacman->x + BLOCK_SIZE > map->pixel_width)
+        pacman->x = 0;
+
     // wall and pacman intersection
-    else if (pacman->x_block_cordinates >= 0 && pacman->x_block_cordinates < map->block_width && pacman->y_block_cordinates >= 0 && pacman->y_block_cordinates < map->block_height)
+    else if (pacman->x_block_cordinates > 0 && pacman->x_block_cordinates < map->block_width - 1 && pacman->y_block_cordinates >= 0 && pacman->y_block_cordinates < map->block_height)
     {
         if (pacman->x_speed > 0) // checks if pacman is in a wall // add general if x y is not out of border
         {
