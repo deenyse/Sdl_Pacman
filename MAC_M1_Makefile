@@ -1,0 +1,22 @@
+CC = gcc
+CFLAGS = -Wall -Wextra -std=c99 -fsanitize=address
+LDFLAGS = -lSDL2 -lSDL2_image -lm -lSDL2_ttf
+
+INCLUDE_PATHS = -I/opt/homebrew/include -I/opt/homebrew/include/SDL2
+
+LIBRARY_PATHS = -L/opt/homebrew/lib
+
+
+SRC = main.c
+EXEC = main
+
+all: $(EXEC)
+
+$(EXEC): $(SRC)
+	$(CC) $(SRC) -o $(EXEC) $(INCLUDE_PATHS) $(LIBRARY_PATHS) $(LDFLAGS)
+
+run: all
+	./$(EXEC)
+
+clean:
+	rm -f $(EXEC)
