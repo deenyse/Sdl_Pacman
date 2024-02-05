@@ -10,7 +10,7 @@ For this project i've intalled by brew SDL_2, SDL_lSDL2_image, SDL2_ttf at path
 ```bash
 /opt/homebrew/include/
 ```
-to run this program delete original Makefile and rename MAC_M1_Makefile to Makefile and change path the libraries, then follow next commands
+to run this program delete original Makefile and rename MAC_M1_Makefile to Makefile and change the libraries path, then follow next commands
 ## Compile and run
 
 Run the following command to compile main
